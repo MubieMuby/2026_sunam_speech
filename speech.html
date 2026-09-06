@@ -1,0 +1,779 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연설문 작성</title><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'ChosunilboNM','조선일보명조','Nanum Myeongjo','Batang','바탕','Noto Serif CJK KR',serif;
+  color:#000; background:#F4F2ED; font-size:12.5px; line-height:1.7;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.sheet { max-width:880px; margin:0 auto; padding:20px 30px 120px; background:#fff;
+  box-shadow:0 0 14px rgba(0,0,0,.08); }
+.top { text-align:right; font-size:11.5px; }
+.hdr { text-align:center; font-size:12px; margin-top:2px; }
+.hdr input.s { width:44px; } .hdr input.n { width:100px; }
+.hdr input { border:none; border-bottom:1.4px solid #000; font-family:inherit; font-size:12.5px;
+  text-align:center; padding:2px 3px; background:#FFFDF2; }
+.titlebox { width:100%; border-collapse:collapse; margin:10px 0 7px; }
+.titlebox td { border:1.2px solid #000; padding:7px 10px; vertical-align:middle; }
+.titlebox .unit { width:108px; text-align:center; font-size:11px; }
+.titlebox .main { text-align:center; }
+.titlebox .main .t { font-size:19px; font-weight:bold; }
+.titlebox .main .s { font-size:11.5px; margin-top:2px; }
+.note { margin:3px 0 0 6px; font-size:11px; }
+.note::before { content:'※ '; }
+u.key { text-decoration:underline; font-weight:bold; }
+
+/* ── 도구 막대 ── */
+.bar { position:sticky; top:0; z-index:50; background:#14181D; color:#fff;
+  padding:7px 10px 8px; border-radius:0 0 10px 10px; font-size:11px; line-height:1.4; }
+.bar .cap { font-weight:bold; margin-right:6px; color:#FFE95C; }
+.bar .row { margin-top:4px; }
+.bar button { font-family:inherit; font-size:11px; padding:3px 8px; margin:2px 2px 0 0;
+  border:1px solid #555; border-radius:6px; cursor:pointer; background:#fff; color:#000; }
+.bar button:hover { outline:2px solid #FFE95C; }
+.bar button.pv { background:#DCEBFF; } .bar button.nv { background:#FFE3CC; }
+.bar #btog { float:right; background:#39434E; color:#fff; border-color:#5A646F; }
+.bar.min .row { display:none; }
+.bar.min { padding:5px 10px; }
+.bar.min::after { content:'도구 막대가 접혀 있습니다'; color:#AEB6BF; font-size:11px; line-height:24px; }
+.bar details.howto { display:inline-block; margin-left:8px; vertical-align:middle; color:#DDD; }
+.bar details.howto summary { cursor:pointer; color:#FFE95C; font-weight:bold; display:inline-block; padding:2px 6px; border:1px solid #555; border-radius:6px; }
+.bar details.howto[open] > div { margin-top:5px; line-height:1.6; }
+.panel .warn { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.panel .brief { display:none; font-weight:normal; }
+.panel #ptog { margin-left:auto; font-family:inherit; font-size:11px; padding:2px 8px; border:1px solid #14181D; border-radius:6px; background:#fff; cursor:pointer; }
+.panel.min .cells { display:none; }
+.panel.min .brief { display:inline; }
+
+/* ── 터치 기기(아이패드·갤럭시탭): 손가락 크기에 맞춘다 ── */
+@media (pointer: coarse) {
+  body { font-size:15px; line-height:1.8; }
+  .sheet { padding:14px 16px 150px; }
+  .hdr { font-size:15px; }
+  .hdr input { font-size:16px; padding:6px 4px; }   /* 16px 미만이면 iOS가 화면을 확대함 */
+  .hdr input.s { width:56px; } .hdr input.n { width:130px; }
+  .titlebox .main .t { font-size:22px; }
+  .note { font-size:13.5px; }
+  .bar { font-size:13px; padding:6px 8px 8px; }
+  .bar .row { margin-top:2px; }
+  .bar button { font-size:13.5px; padding:6px 10px; min-height:38px; margin:3px 3px 0 0; border-radius:8px; }
+  .bar #btog { min-height:32px; padding:3px 10px; font-size:12px; }
+  .bar details.howto summary { padding:6px 10px; min-height:36px; }
+  h2 { font-size:16px; }
+  .ed { font-size:16px; line-height:1.9; padding:14px; min-height:170px;
+    background-image:repeating-linear-gradient(transparent, transparent 29.4px, #EEF1F4 30.4px); }
+  .ed:empty::before { font-size:13px; }
+  span.tl { font-size:11px; padding:1px 6px; }
+  .panel { font-size:12px; padding:6px 10px 8px; }
+  .panel .warn { font-size:11px; }
+  .panel #ptog { font-size:13px; padding:6px 12px; min-height:36px; }
+  .cnum { min-width:26px; padding:2px 6px; }
+  .savebar { bottom:56px; right:10px; }
+  .savebar button { font-size:15px; padding:12px 16px; min-height:46px; }
+}
+
+/* ── 본문 ── */
+h2 { font-size:14px; font-weight:bold; margin:16px 0 4px; }
+h2 .c { font-size:10.5px; font-weight:normal; color:#333; }
+.ed { border:1.4px solid #000; min-height:150px; padding:12px 14px; background:#FFFEFA;
+  border-radius:2px; outline:none;
+  background-image:repeating-linear-gradient(transparent, transparent 20.4px, #EEF1F4 21.4px); }
+.ed:focus { background-color:#FFFDF0; }
+.ed:empty::before { content:attr(data-ph); color:#999; font-size:11px; }
+
+/* 요소 태그(형광펜) */
+span.tag { border-radius:3px; padding:0 2px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+span.tl { display:inline-block; font-size:8.5px; font-weight:bold; background:#14181D; color:#fff;
+  border-radius:3px; padding:0 4px; margin-right:3px; vertical-align:1.5px; cursor:pointer; user-select:none; }
+.t11 { background:#CFE6FF; } .t13 { background:#DBD6FF; } .t21 { background:#FFD9E8; }
+.t31 { background:#E8DCC8; } .t32 { background:#C9F0EA; } .t42 { background:#D5F2CF; }
+.t51 { background:#FFF3B3; } .t61 { background:#FFDFC2; } .t62 { background:#EBD9FF; }
+.t64 { background:#FFCFC7; }
+.t41 { background:#E4E9EF; }
+
+/* 준·비언어 괄호 토큰 — 괄호 안에 구체적인 내용을 직접 적는다 */
+span.mk { border-radius:3px; padding:0 1px; font-size:.92em; font-weight:bold; }
+span.mk.pv { color:#1F6FB2; background:#EAF3FC; }
+span.mk.nv { color:#C05A12; background:#FDF0E5; }
+span.mk.pv::before { content:'['; } span.mk.pv::after { content:']'; }
+span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
+
+/* ── 카운트 패널 ── */
+.panel { position:fixed; bottom:0; left:0; right:0; z-index:60; background:#fff;
+  border-top:2px solid #14181D; padding:5px 12px 7px; font-size:10px; }
+.panel .warn { font-weight:bold; font-size:10px; margin-bottom:3px; }
+.panel .cells { display:flex; flex-wrap:wrap; gap:4px 10px; }
+.panel .cell { white-space:nowrap; }
+.cnum { display:inline-block; min-width:20px; text-align:center; font-weight:bold;
+  background:#DCEBFF; border-radius:5px; padding:0 4px; }
+.cnum.cok { background:#B5F3D0; } .cnum.czero { background:#EEE; color:#999; }
+
+.savebar { position:fixed; bottom:64px; right:18px; z-index:70; }
+.savebar button { font-family:inherit; font-size:14px; font-weight:bold; padding:10px 16px;
+  border:1.4px solid #000; background:#FFE95C; cursor:pointer; border-radius:9px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25); }
+@media print {
+  body { background:#fff; font-size:11px; }
+  .sheet { max-width:none; box-shadow:none; padding:0; }
+  .bar, .panel, .savebar { display:none !important; }
+  .ed { min-height:0; background-image:none; }
+  @page { size:A4 portrait; margin:12mm 11mm; }
+}
+</style></head><body>
+
+<div class="bar">
+ <button id="btog" type="button" onclick="toggleBar()" title="도구 막대 접기/펼치기">접기 ▲</button>
+ <div class="row"><span class="cap">요소 표시</span><button onclick="addTag('1-1','1-1')">1-1 근거+출처</button><button onclick="addTag('1-3','1-3')">1-3 재반박</button><button onclick="addTag('2-1','2-1')">2-1 장면</button><button onclick="addTag('3-1','3-1')">3-1 직접 조사</button><button onclick="addTag('3-2','3-2')">3-2 자료의 한계</button><button onclick="addTag('4-2','4-2')">4-2 연결 표현</button><button onclick="addTag('5-1','5-1')">5-1 용어·비유·강조</button><button onclick="addTag('6-1','6-1')">6-1 맞춤 발언</button><button onclick="addTag('6-2','6-2')">6-2 질문</button><button onclick="addTag('6-4','6-4')">6-4 바라는 바</button></div>
+ <div class="row"><span class="cap">4-1 필수 요소</span><button onclick="addTag('4-1①','① 관심 유발')">① 관심 유발</button><button onclick="addTag('4-1②','② 순서 예고')">② 순서 예고</button><button onclick="addTag('4-1③','③ 요약')">③ 요약</button><button onclick="addTag('4-1④','④ 전망·한계')">④ 전망·한계</button><button onclick="addTag('4-1⑤','⑤ 실천 독려')">⑤ 실천 독려</button></div>
+ <div class="row"><span class="cap">준언어·비언어</span><button class="pv" onclick="addTok('pv')">[ 준언어 ] 넣기</button> <button class="nv" onclick="addTok('nv')">〈 비언어 〉 넣기</button>
+  <details class="howto"><summary>사용법</summary>
+   <div>· <b>요소 표시</b>: 본문에서 표시할 부분을 <b>선택</b>하거나, 그 <b>문장 안을 한 번 누른</b> 뒤 단추를 누르세요 → 형광펜이 칠해집니다. 라벨을 누르면 해제됩니다.<br>
+   · <b>준언어·비언어</b>: 넣을 자리를 누른 뒤 단추를 누르고, 괄호 안에 <b>구체적인 내용</b>을 적으세요 — 예: [잠시 쉼] [여기부터 천천히] [크게 강조] 〈두 손을 펼침〉 〈칠판을 가리킴〉 〈웃는 표정〉</div>
+  </details></div>
+</div>
+
+<div class="sheet">
+<div class="top">2학년 화법과 언어 / 담당교사 김성준</div>
+<div class="hdr">김해수남고등학교&nbsp;
+ <b>2학년</b> <input class="s" id="f_cls" placeholder="반" inputmode="numeric"> <b>반</b>
+ <input class="s" id="f_no" placeholder="번호" inputmode="numeric"> <b>번</b>
+ 이름 <input class="n" id="f_name" placeholder="이름"></div>
+<table class="titlebox"><tr>
+ <td class="unit">수행평가 1<br>설득 연설<br>연설문</td>
+ <td class="main"><div class="t">연설문 쓰기</div></td>
+</tr></table>
+<div class="note">연설문 작성은 <u class="key">수업 시간 안에</u> 하고, 수업이 끝나면 오른쪽 아래 <b>［파일 저장］</b>을 눌러 제출합니다. 파일 이름은 <b>연설문_20931 이름</b>처럼 자동으로 붙습니다.</div>
+<div class="note">컴퓨터에서는 저장 위치를 고르는 창이, <b>아이패드·아이폰</b>에서는 공유 시트가 뜹니다. 공유 시트에서 <b>「파일에 저장」</b>을 고르거나 선생님께 바로 보내면 됩니다. 이어서 쓰려면 이 양식을 열고 <b>［저장한 파일 불러오기］</b>로 저장한 파일을 고르세요.</div>
+<div class="note">표시는 <b>계획</b>입니다. 채점은 발표에서 <u class="key">실제로 입으로 말하고 몸으로 한 것만</u> 대상입니다. 표시만 해 두고 안 하면 점수가 되지 않습니다.</div>
+<div class="note">발표 때 원고를 들고 나가도 됩니다. 다만 <u class="key">원고에만 시선을 고정하고 읽으면</u> 5-3 비언어적 표현은 <u class="key">최하 수준</u>(청중을 보지 않고 원고만 보고 읽은 경우)입니다. 청중을 보며 말하도록 연습하세요.</div>
+
+<section>
+<h2>도입 <span class="c">— 4-1의 ① 관심 유발 · ② 순서 예고가 들어가야 합니다. 쓴 뒤 4-1 버튼으로 표시하세요</span></h2>
+<div class="ed" contenteditable="true" data-sec="intro" data-ph="예) 청중의 경험을 건드리는 첫 문장(① 표시) → 오늘 말할 순서 예고(② 표시) → 나의 주장 한 문장"></div>
+</section>
+<template id="ex2">
+예시 연설 — 교내 분실물 줄이기
+
+지난주 이맘때, 저는 이 교실 뒷문 앞에서 삼 분을 서 있었습니다. 체육복 주머니에
+넣어 둔 교통카드가 사라진 걸 그때 알았거든요. 오늘은 세 가지만 말씀드리겠습니다.
+얼마나 잃어버리는지, 왜 못 찾아가는지, 그리고 여러분께 드리는 부탁입니다.
+
+먼저 규모입니다. 저는 지난 2주 동안 점심시간마다 3층 분실물함을 열어 안에 든
+물건을 세어 보았습니다. 매일 조금씩 달랐지만 어림잡아 열에 여섯은 그 주에 새로
+들어온 물건이었습니다. 그런데 같은 기간에 주인을 찾아간 물건은 손에 꼽았습니다.
+
+이 숫자 뒤에 가려진 것은 따로 있습니다. 물건이 많아서 못 찾는 게 아니라,
+분실물함이 어디 있는지 모르는 사람이 대부분이라는 것입니다. 제가 우리 반에서
+물어봤을 때, 3층 분실물함의 위치를 정확히 아는 사람은 절반이 되지 않았습니다.
+
+여기서 이런 반문이 나올 법합니다. "잃어버린 사람이 알아서 찾아야지, 왜 다 같이
+신경 써야 하느냐." 그 지적은 절반만 맞습니다. 잃어버린 쪽이 찾아야 하는 건
+맞습니다. 그런데 주운 물건을 어디에 둬야 하는지 모르면, 그 물건은 애초에
+분실물함까지 오지도 못합니다. 교실 사물함 위에, 복도 창틀에, 그렇게 남습니다.
+한쪽만 잠근 수도꼭지처럼, 절반만 해결한 셈입니다.
+
+지난달 어느 날 아침이었습니다. 우리 반 뒷자리에서 누군가의 이어폰 한 짝이
+사흘째 같은 자리에 놓여 있는 걸 봤습니다. 아무도 가져가지 않았고, 아무도
+가져다주지 않았습니다. 우리는 그걸 매일 보면서도 매일 지나쳤습니다.
+
+여기까지가 실태입니다. 한 걸음 더 들어가 보겠습니다. 제 부탁은 두 가지입니다.
+거창한 일이 아닙니다. 첫째, 이번 주 금요일 종례가 끝난 뒤에 교실에 남은 물건을
+한 번만 둘러봐 주십시오. 둘째, 주인 없는 물건을 발견하면 그 자리에 두지 말고
+3층 분실물함까지 가져다 놓아 주십시오. 걸어서 이십 초입니다.
+
+여기까지를 한 줄로 줄이면 이렇습니다. 우리가 잃어버린 것은 물건이 아니라,
+그것을 돌려줄 이십 초였습니다. 오늘의 부탁은 그 작은 한 걸음입니다.
+
+
+[다른 주제에도 그대로 쓸 수 있는 이음말]
+· 실태를 다 말한 뒤 원인으로 넘어갈 때 — 여기까지가 겉으로 보이는 것입니다.
+· 근거를 하나 더 얹을 때 — 여기에 하나만 더 얹겠습니다.
+· 반론을 되받고 제자리로 돌아올 때 — 다시 처음 이야기로 돌아오겠습니다.
+</template>
+
+
+<section>
+<h2>전개 <span class="c">— 근거+출처(1-1)는 근거마다, 장면(2-1)·직접 조사(3-1)·재반박(1-3)·연결 표현(4-2)도 쓴 자리에 표시</span></h2>
+<div class="ed" contenteditable="true" data-sec="body" style="min-height:320px"
+ data-ph="예) 첫째, … (4-2 표시) ○○부 2024년 조사에 따르면 … (1-1 표시) 지난주 우리 반에서 … (2-1, 6-1 표시) 물론 …라는 반론이 있습니다. 그러나 … (1-3 표시)"></div>
+</section>
+
+<section>
+<h2>정리 <span class="c">— 4-1의 ③ 요약 · ④ 전망·한계 · ⑤ 실천 독려 + 청중에게 바라는 바(6-4)</span></h2>
+<div class="ed" contenteditable="true" data-sec="close" data-ph="예) 오늘 말씀드린 것은 … (③ 표시) 이대로 가면/이렇게 되면 … (④ 표시) 여러분께 부탁드립니다. … (⑤와 6-4 표시)"></div>
+</section>
+
+<div class="note" style="margin-top:10px">표시가 잘 되었는지는 아래 <b>자동 카운트</b>로 확인하세요. 초록색이 되면 그 요소의 <b>계획 개수</b>는 채워진 것입니다.</div>
+</div>
+
+<div class="savebar"><button onclick="saveFile()">파일 저장 (제출용)</button></div>
+
+<div class="panel">
+<div class="warn"><span>이 숫자는 기계적인 카운트일 뿐 채점에 영향을 미치지 않습니다. 실제 점수는 발표에서 수행한 것으로만 매깁니다.</span>
+ <span class="brief">글자 수 <span class="cnum" id="c_chars">0</span> · 예상 <span class="cnum" id="c_time">0:00</span></span>
+ <button id="ptog" type="button" onclick="togglePanel()">접기 ▼</button></div>
+<div class="cells">
+ <span class="cell" style="color:#555">예상 시간은 1분당 280자 기준 · 목표 3:30~4:00 · 반드시 소리 내어 재 볼 것</span>
+ <span class="cell">1-1 근거+출처 <span class="cnum" id="c_11">0</span>/2</span>
+ <span class="cell">1-3 재반박 <span class="cnum" id="c_13">0</span>/1</span>
+ <span class="cell">2-1 장면 <span class="cnum" id="c_21">0</span>/1</span>
+ <span class="cell">3-1 직접 조사 <span class="cnum" id="c_31">0</span>/1</span>
+ <span class="cell">3-2 한계 <span class="cnum" id="c_32">0</span>/1</span>
+ <span class="cell">4-1 요소 <span class="cnum" id="c_41">0</span>/5</span>
+ <span class="cell">4-2 연결 <span class="cnum" id="c_42">0</span>/3</span>
+ <span class="cell">5-1 용어·비유·강조 <span class="cnum" id="c_51">0</span>/2</span>
+ <span class="cell">5-2 준언어 [ ] <span class="cnum" id="c_para">0</span>/3</span>
+ <span class="cell">5-3 비언어 〈 〉 <span class="cnum" id="c_nv">0</span>/2</span>
+ <span class="cell">6-1 맞춤 <span class="cnum" id="c_61">0</span>/2</span>
+ <span class="cell">6-2 질문 <span class="cnum" id="c_62">0</span>/1</span>
+ <span class="cell">6-4 바라는 바 <span class="cnum" id="c_64">0</span>/1</span>
+</div>
+</div>
+
+<script>
+  // ── 저장·제출 공용 모듈 (개요서·연설문 공용) ──────────────────────
+  // 저장 경로(자동 선택):
+  //   ① 크롬·엣지(PC)   → 저장 위치 선택 창 (showSaveFilePicker)
+  //   ② 아이패드·아이폰 → 공유 시트 (navigator.share) : "파일에 저장" / AirDrop / 카톡·메일 전송
+  //   ③ 그 밖(맥 사파리 등) → 내려받기 (a[download])
+  // 보조 장치:
+  //   · 작성 중 자동 임시저장(localStorage) → 창이 닫혀도 같은 양식을 다시 열면 이어 쓰기 제안
+  //   · [저장한 파일 불러오기] → 아이패드처럼 저장한 HTML을 직접 열어도 스크립트가 안 도는 기기용
+  var NL = String.fromCharCode(10), BS = String.fromCharCode(92);
+  var UA = navigator.userAgent || '';
+  var IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var IS_MAC = !IS_IOS && /Macintosh/.test(UA);
+  var IN_APP = /KAKAOTALK|NAVER\(|Instagram|FBAN|FBAV|Line\/|DaumApps|Whale.*Mobile.*inapp/i.test(UA);
+  var IS_WEBVIEW = IS_IOS && !/Safari\//.test(UA) && !navigator.standalone;   // Documents 등 앱 안 웹뷰(사파리 아님)
+  var DOC_KIND = (document.title || 'form').replace(/\s+/g, '');
+  var DRAFT_KEY = 'draft:' + DOC_KIND + ':' + location.pathname.split('/').pop();
+
+  const pad2 = v => { const d = (v || '').replace(/[^0-9]/g, ''); return d ? d.padStart(2, '0').slice(-2) : ''; };
+  const BAD = [BS, '/', ':', '*', '?', '"', '<', '>', '|'];
+  function cleanName(t){
+    t = String(t).replace(/\.html?$/i, '');
+    BAD.forEach(ch => { t = t.split(ch).join(' '); });
+    return t.replace(/\s+/g, ' ').trim();
+  }
+  function idv(id){ const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; }
+  function autoName(){
+    return cleanName('연설문_2' + pad2(idv('f_cls')) + pad2(idv('f_no')) + ' ' + idv('f_name'));
+  }
+
+  // ── 제출 파일 만들기: 지금 화면 그대로 + 반·번·이름을 속성으로 굳힘 ──
+  function buildHtml(cls, no, name){
+    const doc = document.documentElement.cloneNode(true);
+    const set = (id, v) => { const e = doc.querySelector('#' + id); if (e) e.setAttribute('value', v); };
+    set('f_cls', cls); set('f_no', no); set('f_name', name);
+    doc.querySelectorAll('[data-nosave]').forEach(e => e.remove());   // 안내 띠·토스트는 파일에 남기지 않는다
+    return '<!DOCTYPE html>' + NL + doc.outerHTML;
+  }
+  function buildBlob(cls, no, name){
+    return new Blob([buildHtml(cls, no, name)], {type: 'text/html;charset=utf-8'});
+  }
+
+  // ── 화면 안내(토스트) — alert 대신. 내려받기 창과 겹치지 않는다 ──
+  function toast(msg, ms){
+    let t = document.getElementById('sv_toast');
+    if (!t){
+      t = document.createElement('div'); t.id = 'sv_toast'; t.setAttribute('data-nosave', '1');
+      document.body.appendChild(t);
+    }
+    t.innerHTML = msg; t.classList.add('show');
+    clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('show'), ms || 9000);
+  }
+
+  function shareable(file){
+    try { return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); }
+    catch (e) { return false; }
+  }
+
+  function download(blob, fname){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+  }
+
+  async function saveFile(){
+    const cls = idv('f_cls'), no = idv('f_no'), name = idv('f_name');
+    if (!cls || !no || !name) { alert('맨 위에 반·번호·이름을 먼저 적어 주세요.'); return; }
+
+    const fname = autoName() + '.html';
+    const blob  = buildBlob(cls, no, name);
+    const file  = new File([blob], fname, { type: 'text/html' });
+    saveDraft();
+
+    // ① 크롬·엣지(PC): 저장 위치 선택 창
+    if (window.showSaveFilePicker && !IS_IOS) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fname,
+          types: [{ description: 'HTML 파일', accept: { 'text/html': ['.html'] } }]
+        });
+        const w = await handle.createWritable();
+        await w.write(blob);
+        await w.close();
+        toast('<b>저장했습니다.</b><br>파일 이름: ' + fname + '<br>저장한 파일을 선생님께 제출하세요.');
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;   // 학생이 취소를 눌렀을 때
+        // 그 밖의 오류면 아래 방식으로 넘어간다
+      }
+    }
+
+    // ② 아이패드·아이폰: 공유 시트 → "파일에 저장" 또는 선생님께 바로 전송
+    if (IS_IOS && shareable(file)) {
+      try {
+        await navigator.share({ files: [file], title: fname });
+        toast('<b>공유 시트에서 저장·전송을 마쳤으면 제출 끝입니다.</b><br>파일 이름: ' + fname
+            + '<br>「파일에 저장」을 골랐다면 파일 앱에서 그 파일을 선생님께 보내세요.', 12000);
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;   // 공유 시트를 닫았을 때
+        // 지원 안 되는 경우 → 내려받기
+      }
+    }
+
+    // ③ 내려받기 (맥 사파리, 구형 브라우저 등)
+    download(blob, fname);
+    let where = '내려받기(다운로드) 폴더';
+    if (IS_IOS) where = '파일 앱 → 「다운로드」 폴더 (사파리 오른쪽 위 ⬇ 단추에서도 확인)';
+    else if (IS_MAC) where = 'Finder → 「다운로드」 폴더 (사파리 오른쪽 위 ⬇ 단추)';
+    toast('<b>저장했습니다.</b> 파일 이름: ' + fname + '<br>위치: ' + where + '<br>그 파일을 선생님께 제출하세요.', 12000);
+  }
+
+  async function shareFile(){
+    const cls = idv('f_cls'), no = idv('f_no'), name = idv('f_name');
+    if (!cls || !no || !name) { alert('맨 위에 반·번호·이름을 먼저 적어 주세요.'); return; }
+    const fname = autoName() + '.html';
+    const file = new File([buildBlob(cls, no, name)], fname, { type: 'text/html' });
+    saveDraft();
+    if (!shareable(file)){ download(file, fname); toast('이 브라우저는 공유를 지원하지 않아 내려받기로 저장했습니다: ' + fname); return; }
+    try {
+      await navigator.share({ files: [file], title: fname });
+      toast('<b>전송했습니다.</b> ' + fname + '<br>내 기기에도 남기려면 「파일 저장」을 한 번 더 누르세요.', 10000);
+    } catch (e) { if (!(e && e.name === 'AbortError')) { download(file, fname); toast('공유가 안 되어 내려받기로 저장했습니다: ' + fname); } }
+  }
+
+  // ── 기기 점검: 이 기기에서 쓸 수 있는 저장 방식을 보여 준다 (저장이 안 될 때 확인용) ──
+  function diagnose(){
+    let share = false;
+    try { share = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [new File(['x'], 'x.html', { type: 'text/html' })] })); } catch (e) {}
+    const rows = [
+      ['기기', IS_IOS ? '아이패드·아이폰' : (IS_MAC ? '맥' : (/Android/.test(UA) ? '안드로이드' : 'PC'))],
+      ['화면', IS_WEBVIEW ? '앱 안 웹뷰(사파리 아님)' : (IN_APP ? '앱 안 브라우저' : '브라우저')],
+      ['저장 위치 선택 창', window.showSaveFilePicker ? '가능' : '없음'],
+      ['공유 시트(파일)', share ? '가능' : '없음'],
+      ['내려받기 속성', ('download' in document.createElement('a')) ? '있음' : '없음'],
+      ['임시저장', (function(){ try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); return '가능'; } catch (e) { return '불가'; } })()]
+    ];
+    const t = document.getElementById('sv_toast') || (toast(''), document.getElementById('sv_toast'));
+    t.innerHTML = '<b>이 기기의 저장 방식</b><br>' + rows.map(r => r[0] + ': ' + r[1]).join('<br>')
+      + '<br><span style="font-size:11px;color:#CCC">' + UA.slice(0, 90) + '</span>'
+      + '<br><button type="button" id="sv_copybtn" style="margin-top:6px;font-family:inherit;font-size:13px;padding:6px 10px;border-radius:7px;border:1px solid #999;background:#fff;color:#000;cursor:pointer">비상용: 파일 내용 복사</button>'
+      + ' <button type="button" id="sv_closebtn" style="margin-top:6px;font-family:inherit;font-size:13px;padding:6px 10px;border-radius:7px;border:1px solid #999;background:#333;color:#fff;cursor:pointer">닫기</button>';
+    t.classList.add('show'); clearTimeout(t._tm);
+    document.getElementById('sv_closebtn').onclick = () => t.classList.remove('show');
+    document.getElementById('sv_copybtn').onclick = copyHtml;
+  }
+  // 비상용: 저장·공유가 모두 안 되는 앱에서 — 파일 내용을 복사해 두고, 파일 앱에서 새 텍스트 파일에 붙여넣어 .html로 저장한다
+  async function copyHtml(){
+    const cls = idv('f_cls'), no = idv('f_no'), name = idv('f_name');
+    if (!cls || !no || !name) { alert('맨 위에 반·번호·이름을 먼저 적어 주세요.'); return; }
+    const html = buildHtml(cls, no, name), fname = autoName() + '.html';
+    saveDraft();
+    let done = false;
+    try { await navigator.clipboard.writeText(html); done = true; } catch (e) {}
+    if (!done){
+      const ta = document.createElement('textarea'); ta.value = html; ta.setAttribute('data-nosave', '1');
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+      try { done = document.execCommand('copy'); } catch (e) {} ta.remove();
+    }
+    toast(done ? '<b>파일 내용을 복사했습니다.</b><br>새 텍스트 파일을 만들어 붙여넣고, 파일 이름을 <b>' + fname + '</b> 으로 바꿔 제출하세요.'
+               : '복사에 실패했습니다. 선생님께 알려 주세요.', 15000);
+  }
+
+  // ── 임시저장 (같은 기기·같은 브라우저에서만 복구됨) ─────────────────
+  function snapshot(){
+    return {
+      cls: idv('f_cls'), no: idv('f_no'), name: idv('f_name'),
+      ed: Array.prototype.map.call(document.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
+      cb: Array.prototype.map.call(document.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0),
+      t: Date.now()
+    };
+  }
+  function hasContent(s){
+    return s.ed.some(h => h.replace(/<[^>]+>/g, '').trim().length > 0) || s.cb.some(x => x);
+  }
+  function saveDraft(){
+    try {
+      const s = snapshot();
+      if (hasContent(s) || s.name) localStorage.setItem(DRAFT_KEY, JSON.stringify(s));
+    } catch (e) {}
+  }
+  function loadDraft(){
+    try { const s = localStorage.getItem(DRAFT_KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; }
+  }
+  function dropDraft(){ try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+  var _dtm = null;
+  function scheduleDraft(){ clearTimeout(_dtm); _dtm = setTimeout(saveDraft, 600); }
+  document.addEventListener('input', scheduleDraft);
+  document.addEventListener('click', scheduleDraft);
+  window.addEventListener('pagehide', saveDraft);
+
+  // ── 불러오기: 저장한 파일 또는 임시저장본을 화면에 되살린다 ───────────
+  // 허용 요소만 남긴다(글자·줄바꿈·채점요소 태그·준/비언어 칩). 그 밖의 태그와 스크립트는 버린다.
+  function cleanHtml(html){
+    const src = document.createElement('div'); src.innerHTML = html;
+    const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function walk(el){
+      let out = '';
+      el.childNodes.forEach(n => {
+        if (n.nodeType === 3){ out += esc(n.textContent); return; }
+        if (n.nodeType !== 1) return;
+        const c = n.classList, tag = n.tagName;
+        if (c && c.contains('tl')) return;
+        if (c && c.contains('tag')){
+          const code = n.getAttribute('data-c') || '';
+          const tl = n.querySelector(':scope > .tl');
+          out += '<span class="tag t' + code.replace(/[^0-9a-zA-Z]/g, '') + '" data-c="' + esc(code) + '">'
+               + '<span class="tl" contenteditable="false" title="누르면 표시가 지워집니다">' + esc(tl ? tl.textContent : code) + '</span>'
+               + walk(n) + '</span>';
+          return;
+        }
+        if (c && c.contains('mk')){
+          const kind = c.contains('pv') ? 'pv' : 'nv';
+          out += '<span class="mk ' + kind + '" data-k="' + kind + '">' + esc(n.textContent) + '</span>';
+          return;
+        }
+        if (tag === 'BR'){ out += '<br>'; return; }
+        if (tag === 'DIV' || tag === 'P'){ out += (out ? '<br>' : '') + walk(n); return; }
+        out += walk(n);
+      });
+      return out;
+    }
+    return walk(src);
+  }
+  function applySnapshot(s){
+    const setv = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
+    setv('f_cls', s.cls); setv('f_no', s.no); setv('f_name', s.name);
+    const eds = document.querySelectorAll('[contenteditable="true"]');
+    (s.ed || []).forEach((h, i) => { if (eds[i]) eds[i].innerHTML = cleanHtml(h); });
+    const cbs = document.querySelectorAll('.cb');
+    (s.cb || []).forEach((on, i) => {
+      if (!cbs[i]) return;
+      cbs[i].classList.toggle('on', !!on);
+      const b = cbs[i].querySelector('.bx'); if (b) b.textContent = on ? '■' : '□';
+    });
+    document.dispatchEvent(new Event('input'));
+    document.dispatchEvent(new Event('keyup'));
+  }
+  function snapshotFromDoc(doc){
+    const gv = id => { const e = doc.getElementById(id); return e ? (e.getAttribute('value') || '').trim() : ''; };
+    return {
+      cls: gv('f_cls'), no: gv('f_no'), name: gv('f_name'),
+      ed: Array.prototype.map.call(doc.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
+      cb: Array.prototype.map.call(doc.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0)
+    };
+  }
+  function importFile(file){
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = function(){
+      const doc = new DOMParser().parseFromString(r.result, 'text/html');
+      const s = snapshotFromDoc(doc);
+      const nEd = document.querySelectorAll('[contenteditable="true"]').length;
+      if (s.ed.length !== nEd || (doc.title || '').replace(/\s+/g, '') !== DOC_KIND){
+        alert('이 양식으로 저장한 파일이 아닙니다.' + NL + '(' + file.name + ')'); return;
+      }
+      const cur = snapshot();
+      if (hasContent(cur) && !confirm('지금 화면의 내용을 지우고 「' + file.name + '」의 내용으로 바꿉니다. 계속할까요?')) return;
+      applySnapshot(s);
+      saveDraft();
+      toast('<b>불러왔습니다.</b> ' + file.name + '<br>이어서 쓴 뒤 다시 저장하세요.');
+    };
+    r.readAsText(file, 'utf-8');
+  }
+  function openFile(){
+    let inp = document.getElementById('sv_open');
+    if (!inp){
+      inp = document.createElement('input'); inp.type = 'file'; inp.id = 'sv_open'; inp.accept = '.html,.htm,text/html';
+      inp.hidden = true; inp.setAttribute('data-nosave', '1');
+      inp.addEventListener('change', function(){ importFile(this.files[0]); this.value = ''; });
+      document.body.appendChild(inp);
+    }
+    inp.click();
+  }
+
+  // ── 화면 요소: 스타일 · 불러오기 단추 · 임시저장 복구 띠 · 앱 안 브라우저 경고 ──
+  (function setup(){
+    const css = document.createElement('style'); css.setAttribute('data-nosave', '1');
+    css.textContent = [
+      '#sv_toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(20px);z-index:999;',
+      ' max-width:min(560px,92vw);background:#14181D;color:#fff;font-size:13px;line-height:1.6;padding:12px 16px;',
+      ' border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s}',
+      '#sv_toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}',
+      '#sv_bar{position:fixed;left:0;right:0;top:0;z-index:998;background:#FFF3B3;color:#14181D;border-bottom:2px solid #14181D;',
+      ' font-size:13px;padding:8px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}',
+      '#sv_bar button{font-family:inherit;font-size:13px;font-weight:bold;padding:5px 12px;border:1.4px solid #14181D;border-radius:7px;cursor:pointer;background:#fff}',
+      '#sv_bar button.go{background:#14181D;color:#FFE95C}',
+      '#sv_infobtn{font-family:inherit;font-size:14px;width:34px;height:34px;border:1.2px solid #888;border-radius:50%;background:#fff;cursor:pointer;margin-right:6px;color:#555}',
+      '#sv_openbtn,#sv_sharebtn{font-family:inherit;font-size:12px;padding:6px 10px;border:1.2px solid #14181D;border-radius:8px;background:#fff;cursor:pointer;margin-right:6px;',
+      ' box-shadow:0 2px 8px rgba(0,0,0,.18)}',
+      '@media (pointer:coarse){#sv_openbtn,#sv_sharebtn{font-size:14px;padding:10px 12px;min-height:46px} #sv_infobtn{width:44px;height:44px;font-size:17px}',
+      ' #sv_bar{font-size:14px;padding:10px 12px} #sv_bar button{font-size:14px;padding:8px 14px;min-height:40px} #sv_toast{font-size:14px;bottom:130px}}',
+      '@media print{#sv_toast,#sv_bar,#sv_openbtn,#sv_sharebtn,#sv_infobtn{display:none!important}}'
+    ].join('');
+    document.head.appendChild(css);
+
+    // 불러오기 단추 — 저장 단추 왼쪽에 붙인다
+    const saveBtn = document.querySelector('.savebar button, #savebar #btnsave');
+    if (saveBtn){
+      const b = document.createElement('button'); b.id = 'sv_openbtn'; b.type = 'button'; b.setAttribute('data-nosave', '1');
+      b.textContent = '저장한 파일 불러오기'; b.title = '전에 저장한 파일을 열어 이어서 씁니다';
+      b.addEventListener('click', openFile);
+      saveBtn.parentNode.insertBefore(b, saveBtn);
+      const ib = document.createElement('button'); ib.id = 'sv_infobtn'; ib.type = 'button'; ib.setAttribute('data-nosave', '1');
+      ib.textContent = 'ⓘ'; ib.title = '이 기기에서 쓸 수 있는 저장 방식 보기';
+      ib.addEventListener('click', diagnose);
+      saveBtn.parentNode.insertBefore(ib, b);
+      // 터치 기기(안드로이드 등)에서 공유 시트로 바로 보내기. iOS는 저장 단추 자체가 공유 시트라 숨긴다
+      if (!IS_IOS && navigator.share && navigator.canShare){
+        let can = false;
+        try { can = navigator.canShare({ files: [new File(['x'], 'x.html', { type: 'text/html' })] }); } catch (e) {}
+        if (can && window.matchMedia && window.matchMedia('(pointer: coarse)').matches){
+          const sb = document.createElement('button'); sb.id = 'sv_sharebtn'; sb.type = 'button'; sb.setAttribute('data-nosave', '1');
+          sb.textContent = '선생님께 전송'; sb.title = '공유 시트로 파일을 바로 보냅니다';
+          sb.addEventListener('click', shareFile);
+          saveBtn.parentNode.insertBefore(sb, saveBtn);
+        }
+      }
+    }
+
+    function bar(html, onGo, onNo){
+      const d = document.createElement('div'); d.id = 'sv_bar'; d.setAttribute('data-nosave', '1');
+      d.innerHTML = html;
+      const go = d.querySelector('.go'), no = d.querySelector('.no');
+      if (go) go.addEventListener('click', () => { d.remove(); onGo && onGo(); });
+      if (no) no.addEventListener('click', () => { d.remove(); onNo && onNo(); });
+      document.body.appendChild(d);
+    }
+
+    window.addEventListener('load', function(){
+      if (IN_APP){
+        bar('이 화면은 <b>앱 안의 브라우저</b>라 저장이 안 될 수 있습니다. 오른쪽 위 메뉴(⋯ 또는 ⋮)에서 '
+          + '<b>「Safari로 열기」</b> 또는 <b>「다른 브라우저로 열기」</b>를 고르세요. <button class="no">닫기</button>');
+        return;
+      }
+      const d = loadDraft(), cur = snapshot();
+      if (d && !hasContent(cur) && hasContent(d)){
+        const when = new Date(d.t);
+        const who = (d.cls ? d.cls + '반 ' : '') + (d.no ? d.no + '번 ' : '') + (d.name || '');
+        bar('저장하지 않고 닫힌 <b>작성 내용</b>이 이 기기에 남아 있습니다'
+          + (who.trim() ? ' — <b>' + who.trim() + '</b>' : '')
+          + ' (' + (when.getMonth() + 1) + '/' + when.getDate() + ' ' + when.getHours() + ':' + String(when.getMinutes()).padStart(2, '0') + ')'
+          + ' <button class="go">이어서 쓰기</button> <button class="no">아니요, 새로 씁니다</button>',
+          () => { applySnapshot(d); toast('이어서 씁니다. 다 쓰면 <b>저장</b>을 누르세요.'); },
+          () => { dropDraft(); });
+      }
+    });
+  })();
+
+</script>
+<script>
+  // ── 표시 도구: 선택 영역에 채점요소 태그 / 커서 위치에 준·비언어 칩 ──
+  var NL2 = String.fromCharCode(10);
+
+  function edBoxOf(node){
+    while (node && node !== document.body){
+      if (node.classList && node.classList.contains('ed')) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  // 터치 기기 대비: 단추를 누르는 순간 선택이 풀리므로 마지막 선택 범위를 기억해 둔다
+  var LAST_RANGE = null;
+  document.addEventListener('selectionchange', function(){
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && !sel.isCollapsed && edBoxOf(sel.getRangeAt(0).commonAncestorContainer)){
+      LAST_RANGE = sel.getRangeAt(0).cloneRange();
+    }
+  });
+  // 도구 단추는 눌러도 본문의 포커스·선택을 빼앗지 않는다
+  document.querySelectorAll('.bar button').forEach(function(b){
+    b.addEventListener('pointerdown', function(e){ e.preventDefault(); });
+    b.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  });
+
+  // 커서만 놓인 경우: 커서가 든 문장(마침표·물음표·느낌표·줄바꿈 사이)을 범위로 삼는다
+  function sentenceRange(r){
+    const n = r.startContainer;
+    if (n.nodeType !== 3) return null;
+    const t = n.data, o = r.startOffset;
+    const isEnd = ch => '.?!。？！\n'.indexOf(ch) >= 0;
+    let a = o; while (a > 0 && !isEnd(t[a - 1])) a--;
+    while (a < t.length && /\s/.test(t[a])) a++;
+    let b = o; while (b < t.length && !isEnd(t[b])) b++;
+    if (b < t.length && t[b] !== '\n') b++;           // 문장 부호까지 포함
+    while (b > a && /\s/.test(t[b - 1])) b--;
+    if (b <= a) return null;
+    const rr = document.createRange(); rr.setStart(n, a); rr.setEnd(n, b);
+    return rr;
+  }
+
+  function pickRange(){
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && !sel.isCollapsed) return sel.getRangeAt(0);
+    if (LAST_RANGE && !LAST_RANGE.collapsed && edBoxOf(LAST_RANGE.commonAncestorContainer)
+        && document.contains(LAST_RANGE.commonAncestorContainer)) return LAST_RANGE;
+    if (sel && sel.rangeCount && edBoxOf(sel.getRangeAt(0).commonAncestorContainer)) return sentenceRange(sel.getRangeAt(0));
+    return null;
+  }
+
+  function addTag(code, label){
+    const r = pickRange();
+    if (!r){
+      alert('본문에서 표시할 부분을 선택하거나, 그 문장 안을 한 번 누른 뒤 단추를 누르세요.'); return;
+    }
+    if (!edBoxOf(r.commonAncestorContainer)){
+      alert('본문(도입·전개·정리) 안의 글만 표시할 수 있습니다.'); return;
+    }
+    const span = document.createElement('span');
+    span.className = 'tag t' + code.replace(/[^0-9a-zA-Z]/g, '');
+    span.setAttribute('data-c', code);
+    const tl = document.createElement('span');
+    tl.className = 'tl';
+    tl.setAttribute('contenteditable', 'false');
+    tl.setAttribute('title', '누르면 표시가 지워집니다');
+    tl.textContent = label;
+    try {
+      const frag = r.extractContents();
+      // 안에 이미 있는 같은 태그는 풀어 준다(겹치기 방지)
+      frag.querySelectorAll && frag.querySelectorAll('span.tag').forEach(t => {
+        const p = t.parentNode;
+        t.querySelectorAll('.tl').forEach(x => x.remove());
+        while (t.firstChild) p.insertBefore(t.firstChild, t);
+        t.remove();
+      });
+      span.appendChild(tl);
+      span.appendChild(frag);
+      r.insertNode(span);
+      const sel = window.getSelection(); sel.removeAllRanges(); LAST_RANGE = null;
+      // 커서를 표시 뒤에 둔다 (태블릿에서 바로 이어 쓰기)
+      const after = document.createRange(); after.setStartAfter(span); after.collapse(true); sel.addRange(after);
+      countAll2();
+    } catch (e) { alert('이 범위는 표시할 수 없습니다. 문단 하나 안에서 선택해 보세요.'); }
+  }
+
+  var LAST_CARET = null;
+  document.addEventListener('selectionchange', function(){
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && edBoxOf(sel.getRangeAt(0).commonAncestorContainer)) LAST_CARET = sel.getRangeAt(0).cloneRange();
+  });
+  function addTok(kind){
+    const sel = window.getSelection();
+    let r = (sel.rangeCount && edBoxOf(sel.getRangeAt(0).commonAncestorContainer)) ? sel.getRangeAt(0) : null;
+    if (!r && LAST_CARET && document.contains(LAST_CARET.startContainer)) r = LAST_CARET;
+    if (!r){ alert('본문(도입·전개·정리)에서 넣을 자리를 먼저 누르세요.'); return; }
+    r.collapse(false);
+    const tok = document.createElement('span');
+    tok.className = 'mk ' + kind;
+    tok.setAttribute('data-k', kind);
+    tok.textContent = kind === 'pv' ? '잠시 쉼' : '두 손을 펼침';
+    r.insertNode(tok);
+    // 안의 예시 글자를 통째로 선택해 두어, 바로 타자를 치면 덮어써진다
+    const r2 = document.createRange();
+    r2.selectNodeContents(tok);
+    sel.removeAllRanges(); sel.addRange(r2);
+    countAll2();
+  }
+
+  // 클릭으로 지우기: 칩은 통째로, 태그는 라벨을 누르면 하이라이트만 해제
+  document.addEventListener('click', function(e){
+    const tl = e.target.closest && e.target.closest('span.tl');
+    if (tl){
+      const t = tl.parentNode, p = t.parentNode;
+      tl.remove();
+      while (t.firstChild) p.insertBefore(t.firstChild, t);
+      t.remove(); countAll2();
+    }
+  });
+
+  // 붙여넣기는 서식 없이 글자만
+  document.querySelectorAll('.ed').forEach(function(box){
+    box.addEventListener('paste', function(e){
+      e.preventDefault();
+      const t = (e.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, t);
+    });
+  });
+
+  // ── 기계적 카운트 (채점 아님) ──
+  function pureText(){
+    let s = '';
+    document.querySelectorAll('.ed').forEach(function(box){
+      const c = box.cloneNode(true);
+      c.querySelectorAll('.mk, .tl').forEach(x => x.remove());
+      s += c.innerText + NL2;
+    });
+    return s;
+  }
+  function countAll2(){
+    const txt = pureText();
+    const chars = txt.replace(/\s/g, '').length;
+    const secs = Math.round(chars / 280 * 60);
+    const mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, '0');
+    const put = function(id, v, full){
+      const e = document.getElementById(id); if (!e) return;
+      e.textContent = v;
+      e.className = 'cnum' + (String(v) === '0' || v === '0:00' ? ' czero' : (full !== undefined && v >= full ? ' cok' : ''));
+    };
+    document.getElementById('c_chars').textContent = chars;
+    const te = document.getElementById('c_time');
+    te.textContent = mm + ':' + ss;
+    te.className = 'cnum' + (secs >= 210 && secs <= 240 ? ' cok' : (chars === 0 ? ' czero' : ''));
+    const cnt = function(selector){ return document.querySelectorAll(selector).length; };
+    put('c_para', cnt('span.mk.pv'), 3);
+    put('c_nv', cnt('span.mk.nv'), 2);
+    const tags = function(code){ return cnt('span.tag[data-c="' + code + '"]'); };
+    put('c_11', tags('1-1'), 2); put('c_13', tags('1-3'), 1);
+    put('c_21', tags('2-1'), 1); put('c_31', tags('3-1'), 1); put('c_32', tags('3-2'), 1);
+    put('c_42', tags('4-2'), 3); put('c_51', tags('5-1'), 2);
+    put('c_61', tags('6-1'), 2); put('c_62', tags('6-2'), 1); put('c_64', tags('6-4'), 1);
+    let e41 = 0;
+    ['①','②','③','④','⑤'].forEach(function(k){ if (cnt('span.tag[data-c="4-1' + k + '"]')) e41++; });
+    put('c_41', e41, 5);
+  }
+  function toggleBar(){
+    const b = document.querySelector('.bar'); b.classList.toggle('min');
+    document.getElementById('btog').textContent = b.classList.contains('min') ? '펼치기 ▼' : '접기 ▲';
+  }
+  // 저장 단추는 항상 카운트 판 바로 위에 (판을 펼치거나 접어도 겹치지 않게)
+  function placeSave(){
+    const p = document.querySelector('.panel'), sb = document.querySelector('.savebar');
+    if (p && sb) sb.style.bottom = (p.offsetHeight + 10) + 'px';
+  }
+  window.addEventListener('resize', placeSave);
+  window.addEventListener('load', placeSave);
+  function togglePanel(){
+    const p = document.querySelector('.panel'); p.classList.toggle('min');
+    const b = document.getElementById('ptog'); if (b) b.textContent = p.classList.contains('min') ? '자세히 ▲' : '접기 ▼';
+    placeSave();
+  }
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches){
+    const p = document.querySelector('.panel'); if (p){ p.classList.add('min'); }
+    const b = document.getElementById('ptog'); if (b) b.textContent = '자세히 ▲';
+  }
+  document.addEventListener('input', function(){
+    document.querySelectorAll('span.mk').forEach(function(t){
+      if (!t.textContent.trim()) t.remove();
+    });
+    countAll2();
+  });
+  document.addEventListener('keyup', countAll2);
+  window.addEventListener('load', countAll2);
+
+</script>
+</body></html>
