@@ -38,10 +38,12 @@ u.key { text-decoration:underline; font-weight:bold; }
 .bar details.howto summary { cursor:pointer; color:#FFE95C; font-weight:bold; display:inline-block; padding:2px 6px; border:1px solid #555; border-radius:6px; }
 .bar details.howto[open] > div { margin-top:5px; line-height:1.6; }
 .panel .warn { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-.panel .brief { display:none; font-weight:normal; }
+.panel .brief { display:inline; font-weight:bold; font-size:12px; margin-left:8px; padding:2px 8px; border:1px solid #14181D; border-radius:6px; background:#FFFDF2; }
+.panel .brief .cnum { font-size:13px; }
 .panel #ptog { margin-left:auto; font-family:inherit; font-size:11px; padding:2px 8px; border:1px solid #14181D; border-radius:6px; background:#fff; cursor:pointer; }
 .panel.min .cells { display:none; }
 .panel.min .brief { display:inline; }
+@media (pointer: coarse) { .panel .brief { font-size:13px; } }
 
 /* ── 터치 기기(아이패드·갤럭시탭): 손가락 크기에 맞춘다 ── */
 @media (pointer: coarse) {
@@ -111,12 +113,25 @@ span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
   border:1.4px solid #000; background:#FFE95C; cursor:pointer; border-radius:9px;
   box-shadow:0 2px 8px rgba(0,0,0,.25); }
 @media print {
-  body { background:#fff; font-size:11px; }
+  /* 학생이 들고 읽는 발표 원고: 큰 글씨·넉넉한 줄 간격, 도구·안내·형광펜 라벨은 빼고 준·비언어 괄호는 남긴다 */
+  @page { size:A4 portrait; margin:14mm 16mm; }
+  body { background:#fff; font-size:15pt; line-height:1.95; }
   .sheet { max-width:none; box-shadow:none; padding:0; }
-  .bar, .panel, .savebar { display:none !important; }
-  .ed { min-height:0; background-image:none; }
-  @page { size:A4 portrait; margin:12mm 11mm; }
+  .bar, .panel, .savebar, details.howto, [data-nosave], #sv_bar, #sv_toast, #sv_openbtn, #sv_infobtn, #sv_sharebtn, .pbtn { display:none !important; }
+  .top { font-size:9pt; text-align:right; }
+  .hdr { font-size:11pt; margin:0 0 6mm; }
+  .hdr input { border:none; border-bottom:1px solid #000; font-size:11pt; background:#fff; color:#000; }
+  h2 { font-size:12pt; margin:7mm 0 2mm; padding-bottom:1mm; border-bottom:1px solid #000; page-break-after:avoid; }
+  h2 .c { display:none !important; }
+  .ed { border:none; padding:0 1mm; min-height:0; background:none !important; font-size:15pt; line-height:1.95; orphans:3; widows:3; }
+  .ed:empty::before { content:none !important; }
+  .ed span.tag, .ed .tag { background:transparent !important; box-shadow:none !important; border:0 !important; padding:0 !important; color:inherit !important; }
+  .ed .tl { display:none !important; }
+  .ed span.mk, .ed .mk { font-weight:bold; background:transparent !important; }
+  .ed span.mk.pv, .ed .mk.pv { color:#000; } .ed span.mk.nv, .ed .mk.nv { color:#000; }
 }
+.pbtn { font-family:inherit; font-size:11px; padding:3px 9px; margin-left:8px; border:1.2px solid #000; border-radius:6px; background:#fff; cursor:pointer; vertical-align:middle; }
+@media (pointer: coarse) { .pbtn { font-size:14px; padding:8px 12px; } }
 </style></head><body>
 
 <div class="bar">
@@ -131,7 +146,7 @@ span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
 </div>
 
 <div class="sheet">
-<div class="top">2학년 화법과 언어 / 담당교사 김성준</div>
+<div class="top">2학년 화법과 언어 / 담당교사 김성준 <button type="button" class="pbtn" onclick="openPrintPage()" title="새 탭에 발표 원고만 깨끗하게 띄웁니다. 거기서 인쇄하거나 PDF로 저장하세요">🖨 인쇄 페이지 열기</button><button type="button" class="pbtn" onclick="window.print()" title="이 화면을 바로 인쇄합니다 (도구·안내·표시 라벨은 빠지고 준·비언어 괄호는 남습니다)">바로 인쇄</button></div>
 <div class="hdr">김해수남고등학교&nbsp;
  <b>2학년</b> <input class="s" id="f_cls" placeholder="반" inputmode="numeric"> <b>반</b>
  <input class="s" id="f_no" placeholder="번호" inputmode="numeric"> <b>번</b>
@@ -211,7 +226,7 @@ span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
  <span class="brief">글자 수 <span class="cnum" id="c_chars">0</span> · 예상 <span class="cnum" id="c_time">0:00</span></span>
  <button id="ptog" type="button" onclick="togglePanel()">접기 ▼</button></div>
 <div class="cells">
- <span class="cell" style="color:#555">예상 시간은 1분당 280자 기준 · 목표 3:30~4:00 · 반드시 소리 내어 재 볼 것</span>
+ <span class="cell" style="color:#555">예상 시간은 띄어쓰기를 뺀 글자 수 ÷ 분당 280자 · 목표 3:30~4:00(초록) · 반드시 소리 내어 재 볼 것</span>
  <span class="cell">1-1 근거+출처 <span class="cnum" id="c_11">0</span>/2</span>
  <span class="cell">1-3 재반박 <span class="cnum" id="c_13">0</span>/1</span>
  <span class="cell">2-1 장면 <span class="cnum" id="c_21">0</span>/1</span>
@@ -455,6 +470,56 @@ span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
     }
     return walk(src);
   }
+  // ── 붙여넣기: 글자만 들어오게 (다른 앱의 글꼴·크기·색은 버린다) ─────────
+  function edCell(n){ n = n && n.nodeType === 3 ? n.parentNode : n; return n && n.closest ? n.closest('[contenteditable="true"]') : null; }
+  document.addEventListener('paste', function(e){
+    const cell = edCell(e.target); if (!cell) return;
+    e.preventDefault();
+    const cd = e.clipboardData || window.clipboardData;
+    let t = cd ? (cd.getData('text/plain') || '') : '';
+    t = t.replace(/\r\n?/g, NL).replace(/\u00a0/g, ' ');
+    let ok = false;
+    try { ok = document.execCommand('insertText', false, t); } catch (err) { ok = false; }
+    if (!ok){
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount){
+        const r = sel.getRangeAt(0); r.deleteContents();
+        const frag = document.createDocumentFragment();
+        t.split(NL).forEach((line, i) => { if (i) frag.appendChild(document.createElement('br')); frag.appendChild(document.createTextNode(line)); });
+        const last = frag.lastChild; r.insertNode(frag);
+        if (last){ r.setStartAfter(last); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); }
+      } else { cell.appendChild(document.createTextNode(t)); }
+    }
+    setTimeout(function(){ scrub(cell); cell.dispatchEvent(new Event('input', {bubbles: true})); }, 0);
+  });
+  // 어떤 경로로든(끌어다 놓기·자동완성) 서식이 들어오면 즉시 벗긴다. 채점 요소 표시(tag/mk)는 남긴다.
+  function scrub(cell){
+    if (!cell) return;
+    const bad = cell.querySelector('[style],[contenteditable],div,p,font,span:not(.tag):not(.tl):not(.mk),b,i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
+    if (!bad) return;
+    const sel = window.getSelection(); const had = sel && sel.rangeCount && cell.contains(sel.anchorNode);
+    cell.innerHTML = cleanHtml(cell.innerHTML);
+    if (typeof prog === 'function') prog();
+    if (had){ const r = document.createRange(); r.selectNodeContents(cell); r.collapse(false); sel.removeAllRanges(); sel.addRange(r); }
+  }
+  document.addEventListener('input', function(e){ const c = edCell(e.target); if (c) scrub(c); });
+  // 끌어다 놓기도 글자만 (칸을 통째로 끌어 놓으면 칸이 늘어나던 문제)
+  document.addEventListener('drop', function(e){
+    const c = edCell(e.target); if (!c) return;
+    e.preventDefault();
+    let t = e.dataTransfer ? (e.dataTransfer.getData('text/plain') || '') : '';
+    t = t.replace(/\r\n?/g, NL);
+    let r = null;
+    if (document.caretRangeFromPoint) r = document.caretRangeFromPoint(e.clientX, e.clientY);
+    else if (document.caretPositionFromPoint){ const p = document.caretPositionFromPoint(e.clientX, e.clientY); if (p){ r = document.createRange(); r.setStart(p.offsetNode, p.offset); r.collapse(true); } }
+    if (!r || !c.contains(r.startContainer)){ r = document.createRange(); r.selectNodeContents(c); r.collapse(false); }
+    const frag = document.createDocumentFragment();
+    t.split(NL).forEach((line, i) => { if (i) frag.appendChild(document.createElement('br')); frag.appendChild(document.createTextNode(line)); });
+    r.insertNode(frag);
+    setTimeout(function(){ scrub(c); c.dispatchEvent(new Event('input', {bubbles: true})); }, 0);
+  });
+  window.addEventListener('load', function(){ document.querySelectorAll('[contenteditable="true"]').forEach(scrub); });
+
   function applySnapshot(s){
     const setv = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
     setv('f_cls', s.cls); setv('f_no', s.no); setv('f_name', s.name);
@@ -746,6 +811,64 @@ span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
     ['①','②','③','④','⑤'].forEach(function(k){ if (cnt('span.tag[data-c="4-1' + k + '"]')) e41++; });
     put('c_41', e41, 5);
   }
+  // ── 인쇄 페이지: 새 탭에 발표 원고만 깨끗하게 (그 탭에서 인쇄·PDF 저장) ──
+  function buildPrintHtml(){
+    const esc = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function walk(el){
+      let out = '';
+      el.childNodes.forEach(n => {
+        if (n.nodeType === 3){ out += esc(n.textContent); return; }
+        if (n.nodeType !== 1) return;
+        const c = n.classList, tag = n.tagName;
+        if (c && c.contains('tl')) return;                                   // 형광펜 라벨은 뺀다
+        if (c && c.contains('mk')){ const k = c.contains('pv') ? 'pv' : 'nv'; out += '<b class="mk ' + k + '">' + esc(n.textContent) + '</b>'; return; }
+        if (tag === 'BR'){ out += '<br>'; return; }
+        if (tag === 'DIV' || tag === 'P'){ out += (out ? '<br>' : '') + walk(n); return; }
+        out += walk(n);
+      });
+      return out;
+    }
+    const v = id => { const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
+    const who = [v('f_cls') ? v('f_cls') + '반' : '', v('f_no') ? v('f_no') + '번' : '', v('f_name')].filter(Boolean).join(' ');
+    const secs = [];
+    document.querySelectorAll('section').forEach(sec => {
+      const h = sec.querySelector('h2'), ed = sec.querySelector('.ed');
+      if (!h || !ed) return;
+      const title = (h.childNodes[0] && h.childNodes[0].nodeType === 3) ? h.childNodes[0].textContent.trim() : h.innerText.trim();
+      const body = walk(ed).replace(/^(<br>)+|(<br>)+$/g, '');
+      if (body.replace(/<br>/g, '').trim()) secs.push('<h2>' + esc(title) + '</h2><div class="p">' + body + '</div>');
+    });
+    const plain = document.querySelectorAll('.ed');
+    let chars = 0; plain.forEach(b => { const c = b.cloneNode(true); c.querySelectorAll('.mk,.tl').forEach(x => x.remove()); chars += c.innerText.replace(/\s/g, '').length; });
+    const sec = Math.round(chars / 280 * 60), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0');
+    return '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>발표 원고' + (who ? ' — ' + esc(who) : '') + '</title><style>'
+      + '@page{size:A4 portrait;margin:14mm 16mm}'
+      + "body{font-family:'ChosunilboNM','조선일보명조','Nanum Myeongjo','Batang','바탕','Noto Serif CJK KR',serif;color:#000;background:#fff;margin:0;padding:0}"
+      + '.wrap{max-width:820px;margin:0 auto;padding:18px 20px 60px;font-size:15pt;line-height:1.95}'
+      + '.tools{position:sticky;top:0;background:#14181D;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:14px;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif}'
+      + '.tools button{font:inherit;font-size:15px;font-weight:bold;padding:8px 16px;border:1.4px solid #000;border-radius:9px;background:#FFE95C;cursor:pointer}'
+      + '.tools .sz button{background:#fff;font-weight:normal;padding:6px 10px}'
+      + '.tools .tip{opacity:.85;margin-left:auto;font-size:12.5px}'
+      + '.meta{font-size:10.5pt;text-align:right;color:#333;border-bottom:1px solid #000;padding-bottom:4px;margin-bottom:8mm}'
+      + 'h2{font-size:12pt;margin:7mm 0 2mm;padding-bottom:1mm;border-bottom:1px solid #000;page-break-after:avoid}'
+      + '.p{orphans:3;widows:3;white-space:normal}'
+      + 'b.mk{font-weight:bold} b.mk.pv::before{content:"["} b.mk.pv::after{content:"]"} b.mk.nv::before{content:"〈"} b.mk.nv::after{content:"〉"}'
+      + '@media print{.tools{display:none} .wrap{max-width:none;padding:0}}'
+      + '</style></head><body>'
+      + '<div class="tools"><button onclick="window.print()">🖨 인쇄</button>'
+      + '<span class="sz">글자 <button onclick="document.querySelector(\'.wrap\').style.fontSize=\'13pt\'">작게</button><button onclick="document.querySelector(\'.wrap\').style.fontSize=\'15pt\'">보통</button><button onclick="document.querySelector(\'.wrap\').style.fontSize=\'18pt\'">크게</button></span>'
+      + '<span class="tip">아이패드: 인쇄 창에서 두 손가락으로 벌리면 PDF로 저장·공유할 수 있습니다</span></div>'
+      + '<div class="wrap"><div class="meta">2학년 화법과 언어 · 설득 연설 발표 원고' + (who ? ' · ' + esc(who) : '') + ' · 글자 ' + chars + '자 · 예상 ' + mm + ':' + ss + ' (분당 280자 기준)</div>'
+      + (secs.length ? secs.join('') : '<p style="color:#888">아직 쓴 내용이 없습니다.</p>')
+      + '</div></body></html>';
+  }
+  function openPrintPage(){
+    const html = buildPrintHtml();
+    const w = window.open('', '_blank');
+    if (!w){ alert('새 창이 막혔습니다. 브라우저의 팝업 차단을 풀거나, 대신 「발표용 인쇄」를 누르세요.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  window.openPrintPage = openPrintPage; window.buildPrintHtml = buildPrintHtml;
   function toggleBar(){
     const b = document.querySelector('.bar'); b.classList.toggle('min');
     document.getElementById('btog').textContent = b.classList.contains('min') ? '펼치기 ▼' : '접기 ▲';

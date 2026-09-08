@@ -506,6 +506,56 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
     }
     return walk(src);
   }
+  // ── 붙여넣기: 글자만 들어오게 (다른 앱의 글꼴·크기·색은 버린다) ─────────
+  function edCell(n){ n = n && n.nodeType === 3 ? n.parentNode : n; return n && n.closest ? n.closest('[contenteditable="true"]') : null; }
+  document.addEventListener('paste', function(e){
+    const cell = edCell(e.target); if (!cell) return;
+    e.preventDefault();
+    const cd = e.clipboardData || window.clipboardData;
+    let t = cd ? (cd.getData('text/plain') || '') : '';
+    t = t.replace(/\r\n?/g, NL).replace(/\u00a0/g, ' ');
+    let ok = false;
+    try { ok = document.execCommand('insertText', false, t); } catch (err) { ok = false; }
+    if (!ok){
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount){
+        const r = sel.getRangeAt(0); r.deleteContents();
+        const frag = document.createDocumentFragment();
+        t.split(NL).forEach((line, i) => { if (i) frag.appendChild(document.createElement('br')); frag.appendChild(document.createTextNode(line)); });
+        const last = frag.lastChild; r.insertNode(frag);
+        if (last){ r.setStartAfter(last); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); }
+      } else { cell.appendChild(document.createTextNode(t)); }
+    }
+    setTimeout(function(){ scrub(cell); cell.dispatchEvent(new Event('input', {bubbles: true})); }, 0);
+  });
+  // 어떤 경로로든(끌어다 놓기·자동완성) 서식이 들어오면 즉시 벗긴다. 채점 요소 표시(tag/mk)는 남긴다.
+  function scrub(cell){
+    if (!cell) return;
+    const bad = cell.querySelector('[style],[contenteditable],div,p,font,span:not(.tag):not(.tl):not(.mk),b,i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
+    if (!bad) return;
+    const sel = window.getSelection(); const had = sel && sel.rangeCount && cell.contains(sel.anchorNode);
+    cell.innerHTML = cleanHtml(cell.innerHTML);
+    if (typeof prog === 'function') prog();
+    if (had){ const r = document.createRange(); r.selectNodeContents(cell); r.collapse(false); sel.removeAllRanges(); sel.addRange(r); }
+  }
+  document.addEventListener('input', function(e){ const c = edCell(e.target); if (c) scrub(c); });
+  // 끌어다 놓기도 글자만 (칸을 통째로 끌어 놓으면 칸이 늘어나던 문제)
+  document.addEventListener('drop', function(e){
+    const c = edCell(e.target); if (!c) return;
+    e.preventDefault();
+    let t = e.dataTransfer ? (e.dataTransfer.getData('text/plain') || '') : '';
+    t = t.replace(/\r\n?/g, NL);
+    let r = null;
+    if (document.caretRangeFromPoint) r = document.caretRangeFromPoint(e.clientX, e.clientY);
+    else if (document.caretPositionFromPoint){ const p = document.caretPositionFromPoint(e.clientX, e.clientY); if (p){ r = document.createRange(); r.setStart(p.offsetNode, p.offset); r.collapse(true); } }
+    if (!r || !c.contains(r.startContainer)){ r = document.createRange(); r.selectNodeContents(c); r.collapse(false); }
+    const frag = document.createDocumentFragment();
+    t.split(NL).forEach((line, i) => { if (i) frag.appendChild(document.createElement('br')); frag.appendChild(document.createTextNode(line)); });
+    r.insertNode(frag);
+    setTimeout(function(){ scrub(c); c.dispatchEvent(new Event('input', {bubbles: true})); }, 0);
+  });
+  window.addEventListener('load', function(){ document.querySelectorAll('[contenteditable="true"]').forEach(scrub); });
+
   function applySnapshot(s){
     const setv = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
     setv('f_cls', s.cls); setv('f_no', s.no); setv('f_name', s.name);
