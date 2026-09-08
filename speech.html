@@ -30,6 +30,7 @@ u.key { text-decoration:underline; font-weight:bold; }
   border:1px solid #555; border-radius:6px; cursor:pointer; background:#fff; color:#000; }
 .bar button:hover { outline:2px solid #FFE95C; }
 .bar button.pv { background:#DCEBFF; } .bar button.nv { background:#FFE3CC; }
+.bar button.ex { background:#EEE; border-style:dashed; }
 .bar #btog { float:right; background:#39434E; color:#fff; border-color:#5A646F; }
 .bar.min .row { display:none; }
 .bar.min { padding:5px 10px; }
@@ -162,10 +163,10 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
  <button id="btog" type="button" onclick="toggleBar()" title="도구 막대 접기/펼치기">접기 ▲</button>
  <div class="row"><span class="cap">요소 표시</span><button onclick="addTag('1-1','1-1')">1-1 근거+출처</button><button onclick="addTag('1-3','1-3')">1-3 재반박</button><button onclick="addTag('2-1','2-1')">2-1 장면</button><button onclick="addTag('3-1','3-1')">3-1 직접 조사</button><button onclick="addTag('3-2','3-2')">3-2 자료의 한계</button><button onclick="addTag('4-2','4-2')">4-2 연결 표현</button><button onclick="addTag('5-1','5-1')">5-1 용어·비유·강조</button><button onclick="addTag('6-1','6-1')">6-1 맞춤 발언</button><button onclick="addTag('6-2','6-2')">6-2 질문</button><button onclick="addTag('6-4','6-4')">6-4 바라는 바</button></div>
  <div class="row"><span class="cap">4-1 필수 요소</span><button onclick="addTag('4-1①','① 관심 유발')">① 관심 유발</button><button onclick="addTag('4-1②','② 순서 예고')">② 순서 예고</button><button onclick="addTag('4-1③','③ 요약')">③ 요약</button><button onclick="addTag('4-1④','④ 전망·한계')">④ 전망·한계</button><button onclick="addTag('4-1⑤','⑤ 실천 독려')">⑤ 실천 독려</button></div>
- <div class="row"><span class="cap">준언어·비언어</span><button class="pv" onclick="addTok('pv')">[ 준언어 ] 넣기</button> <button class="nv" onclick="addTok('nv')">〈 비언어 〉 넣기</button>
+ <div class="row"><span class="cap">준언어·비언어</span><button class="pv" onclick="addTok('pv')">[ 준언어 ] 넣기</button> <button class="nv" onclick="addTok('nv')">〈 비언어 〉 넣기</button> <button class="ex" onclick="exitChip()" title="괄호 안에 갇힌 커서를 괄호 뒤로 옮깁니다 (키보드: Enter 또는 →)">괄호 밖으로 ↦</button>
   <details class="howto"><summary>사용법</summary>
    <div>· <b>요소 표시</b>: 본문에서 표시할 부분을 <b>선택</b>하거나, 그 <b>문장 안을 한 번 누른</b> 뒤 단추를 누르세요 → 형광펜이 칠해집니다. 라벨을 누르면 해제됩니다.<br>
-   · <b>준언어·비언어</b>: 넣을 자리를 누른 뒤 단추를 누르고, 괄호 안에 <b>구체적인 내용</b>을 적으세요 — 예: [잠시 쉼] [여기부터 천천히] [크게 강조] 〈두 손을 펼침〉 〈칠판을 가리킴〉 〈웃는 표정〉</div>
+   · <b>준언어·비언어</b>: 넣을 자리를 누른 뒤 단추를 누르고, 괄호 안에 <b>구체적인 내용</b>을 적으세요. 다 적었으면 <b>Enter</b>(또는 →, 태블릿은 「괄호 밖으로」 단추)로 괄호 밖으로 나가 이어서 쓰세요 — 예: [잠시 쉼] [여기부터 천천히] [크게 강조] 〈두 손을 펼침〉 〈칠판을 가리킴〉 〈웃는 표정〉</div>
   </details></div>
 </div>
 
@@ -772,12 +773,50 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
     tok.setAttribute('data-k', kind);
     tok.textContent = kind === 'pv' ? '잠시 쉼' : '두 손을 펼침';
     r.insertNode(tok);
+    // 칩 뒤에 빈칸 하나를 두어, 그 뒤를 누르거나 「괄호 밖으로」로 나가 이어 쓸 수 있게 한다
+    // 일반 빈칸은 줄 끝에서 브라우저가 지워 버리므로 지워지지 않는 빈칸(NBSP)을 쓴다
+    if (!(tok.nextSibling && tok.nextSibling.nodeType === 3 && tok.nextSibling.data.charAt(0) === String.fromCharCode(160)))
+      tok.parentNode.insertBefore(document.createTextNode(String.fromCharCode(160)), tok.nextSibling);
     // 안의 예시 글자를 통째로 선택해 두어, 바로 타자를 치면 덮어써진다
     const r2 = document.createRange();
     r2.selectNodeContents(tok);
     sel.removeAllRanges(); sel.addRange(r2);
     countAll2();
   }
+
+  // ── 괄호(칩) 밖으로 나가기: 커서가 칩 안에 있으면 칩 바로 뒤로 옮긴다 ──
+  function chipOf(node){
+    while (node && node !== document.body){
+      if (node.nodeType === 1 && node.classList.contains('mk')) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+  function exitChip(){
+    const sel = window.getSelection();
+    let tok = sel.rangeCount ? chipOf(sel.getRangeAt(0).startContainer) : null;
+    if (!tok && LAST_CARET) tok = chipOf(LAST_CARET.startContainer);
+    if (!tok){ return false; }
+    const NB = String.fromCharCode(160);
+    let nx = tok.nextSibling;
+    if (!(nx && nx.nodeType === 3)){ nx = document.createTextNode(NB); tok.parentNode.insertBefore(nx, tok.nextSibling); }
+    else if (nx.data.charAt(0) !== NB) { nx.data = NB + nx.data; }
+    const r = document.createRange(); r.setStart(nx, 1); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    const box = edBoxOf(nx); if (box) box.focus();
+    return true;
+  }
+  window.exitChip = exitChip;
+  document.addEventListener('keydown', function(e){
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed) return;
+    const r = sel.getRangeAt(0), tok = chipOf(r.startContainer);
+    if (!tok) return;
+    const atEnd = r.startContainer.nodeType === 3 && r.startOffset === r.startContainer.data.length && r.startContainer === tok.lastChild;
+    if (e.key === 'Enter' || (e.key === 'ArrowRight' && atEnd) || (e.key === 'Tab' && !e.shiftKey)){
+      e.preventDefault(); exitChip();
+    }
+  });
 
   // 클릭으로 지우기: 칩은 통째로, 태그는 라벨을 누르면 하이라이트만 해제
   document.addEventListener('click', function(e){
