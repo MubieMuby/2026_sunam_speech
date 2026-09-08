@@ -511,6 +511,7 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
   function edCell(n){ n = n && n.nodeType === 3 ? n.parentNode : n; return n && n.closest ? n.closest('[contenteditable="true"]') : null; }
   document.addEventListener('paste', function(e){
     const cell = edCell(e.target); if (!cell) return;
+    if (e.defaultPrevented) return;          // 칸 자체의 붙여넣기 처리(연설문 양식)가 이미 넣었으면 건너뛴다
     e.preventDefault();
     const cd = e.clipboardData || window.clipboardData;
     let t = cd ? (cd.getData('text/plain') || '') : '';
@@ -532,14 +533,19 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
   // 어떤 경로로든(끌어다 놓기·자동완성) 서식이 들어오면 즉시 벗긴다. 채점 요소 표시(tag/mk)는 남긴다.
   function scrub(cell){
     if (!cell) return;
-    const bad = cell.querySelector('[style],[contenteditable],div,p,font,span:not(.tag):not(.tl):not(.mk),b,i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
+    // 칩(span.mk)·형광펜(span.tag/.tl)은 이 양식의 정식 요소 — 이물질이 아니다. 중첩된 '입력칸'과 서식 태그만 잡는다.
+    const bad = cell.querySelector('[style],[contenteditable="true"],div,p,font,span:not(.tag):not(.tl):not(.mk),b:not(.mk),i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
     if (!bad) return;
     const sel = window.getSelection(); const had = sel && sel.rangeCount && cell.contains(sel.anchorNode);
     cell.innerHTML = cleanHtml(cell.innerHTML);
     if (typeof prog === 'function') prog();
     if (had){ const r = document.createRange(); r.selectNodeContents(cell); r.collapse(false); sel.removeAllRanges(); sel.addRange(r); }
   }
-  document.addEventListener('input', function(e){ const c = edCell(e.target); if (c) scrub(c); });
+  // 한글 조합 중에는 DOM 을 건드리면 조합이 끊긴다 → 조합이 끝난 뒤에 정리한다
+  var COMPOSING = false, SCRUB_LATER = null;
+  document.addEventListener('compositionstart', function(){ COMPOSING = true; });
+  document.addEventListener('compositionend', function(e){ COMPOSING = false; const c = SCRUB_LATER || edCell(e.target); SCRUB_LATER = null; if (c) setTimeout(function(){ scrub(c); }, 0); });
+  document.addEventListener('input', function(e){ if (e.isComposing || COMPOSING){ SCRUB_LATER = edCell(e.target); return; } const c = edCell(e.target); if (c) scrub(c); });
   // 끌어다 놓기도 글자만 (칸을 통째로 끌어 놓으면 칸이 늘어나던 문제)
   document.addEventListener('drop', function(e){
     const c = edCell(e.target); if (!c) return;

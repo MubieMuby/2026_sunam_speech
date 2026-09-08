@@ -510,6 +510,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   function edCell(n){ n = n && n.nodeType === 3 ? n.parentNode : n; return n && n.closest ? n.closest('[contenteditable="true"]') : null; }
   document.addEventListener('paste', function(e){
     const cell = edCell(e.target); if (!cell) return;
+    if (e.defaultPrevented) return;          // 칸 자체의 붙여넣기 처리(연설문 양식)가 이미 넣었으면 건너뛴다
     e.preventDefault();
     const cd = e.clipboardData || window.clipboardData;
     let t = cd ? (cd.getData('text/plain') || '') : '';
@@ -531,14 +532,19 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   // 어떤 경로로든(끌어다 놓기·자동완성) 서식이 들어오면 즉시 벗긴다. 채점 요소 표시(tag/mk)는 남긴다.
   function scrub(cell){
     if (!cell) return;
-    const bad = cell.querySelector('[style],[contenteditable],div,p,font,span:not(.tag):not(.tl):not(.mk),b,i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
+    // 칩(span.mk)·형광펜(span.tag/.tl)은 이 양식의 정식 요소 — 이물질이 아니다. 중첩된 '입력칸'과 서식 태그만 잡는다.
+    const bad = cell.querySelector('[style],[contenteditable="true"],div,p,font,span:not(.tag):not(.tl):not(.mk),b:not(.mk),i,u,strong,em,h1,h2,h3,h4,h5,h6,table,img,a,pre,code,blockquote,ul,ol,li');
     if (!bad) return;
     const sel = window.getSelection(); const had = sel && sel.rangeCount && cell.contains(sel.anchorNode);
     cell.innerHTML = cleanHtml(cell.innerHTML);
     if (typeof prog === 'function') prog();
     if (had){ const r = document.createRange(); r.selectNodeContents(cell); r.collapse(false); sel.removeAllRanges(); sel.addRange(r); }
   }
-  document.addEventListener('input', function(e){ const c = edCell(e.target); if (c) scrub(c); });
+  // 한글 조합 중에는 DOM 을 건드리면 조합이 끊긴다 → 조합이 끝난 뒤에 정리한다
+  var COMPOSING = false, SCRUB_LATER = null;
+  document.addEventListener('compositionstart', function(){ COMPOSING = true; });
+  document.addEventListener('compositionend', function(e){ COMPOSING = false; const c = SCRUB_LATER || edCell(e.target); SCRUB_LATER = null; if (c) setTimeout(function(){ scrub(c); }, 0); });
+  document.addEventListener('input', function(e){ if (e.isComposing || COMPOSING){ SCRUB_LATER = edCell(e.target); return; } const c = edCell(e.target); if (c) scrub(c); });
   // 끌어다 놓기도 글자만 (칸을 통째로 끌어 놓으면 칸이 늘어나던 문제)
   document.addEventListener('drop', function(e){
     const c = edCell(e.target); if (!c) return;
@@ -793,12 +799,19 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   //   (실기기 아이패드에서 칩을 누르면 커서가 문단 끝으로 튀고, 갤럭시에서는 칩 뒤 빈칸 때문에 한글 조합이 끊기던 문제를
   //    칩을 수정 불가 덩어리로 만들고 내용은 여기서만 고치게 해서 함께 없앤다)
   var CHIP = null;
+  // 칩 뒤에 '폭 0 공백'(U+200B) 글자 노드를 보장한다. 커서가 요소 경계(칩 바로 뒤)에 있으면 영문은 들어가도
+  // 한글 IME 조합은 시작하지 못한다(실기기 확인 2026-09-08). U+200B 는 공백이 아니라 크롬의 공백 정리(rebalance)도 타지 않는다.
+  var ZW = String.fromCharCode(8203);
+  function zwAfter(mk){
+    let n = mk.nextSibling;
+    if (n && n.nodeType === 3){ if (n.nodeValue.charAt(0) !== ZW) n.nodeValue = ZW + n.nodeValue; return n; }
+    n = document.createTextNode(ZW); mk.parentNode.insertBefore(n, mk.nextSibling); return n;
+  }
   function caretAfter(mk){
-    // 칩 바로 뒤에 커서. 칩이 문단 끝이면 커서 자리를 위해 <br> 하나를 둔다 (빈칸을 쓰면 브라우저가 공백 정리를 하며 조합을 끊는다)
     const box = edBoxOf(mk);
-    if (!mk.nextSibling) mk.parentNode.appendChild(document.createElement('br'));
+    const n = zwAfter(mk);
     if (box) box.focus();
-    const r = document.createRange(); r.setStartAfter(mk); r.collapse(true);
+    const r = document.createRange(); r.setStart(n, 1); r.collapse(true);   // 폭 0 공백 '안', 그 뒤에 커서
     const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
   }
   function chipEditor(){
@@ -847,6 +860,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   });
   // 예전 파일(칩이 편집 가능하던 판)을 열었을 때도 같은 규칙을 적용한다
   function normalizeChips(){
+    document.querySelectorAll('.ed span.mk').forEach(zwAfter);   // 예전 판 파일의 칩 뒤에도 커서 자리를 만든다
     document.querySelectorAll('.ed span.mk').forEach(function(m){
       m.setAttribute('contenteditable', 'false');
       if (!m.textContent.trim()) m.remove();
@@ -886,7 +900,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   }
   function countAll2(){
     const txt = pureText();
-    const chars = txt.replace(/\s/g, '').length;
+    const chars = txt.replace(/\s/g, '').replace(/\u200B/g, '').length;
     const secs = Math.round(chars / 280 * 60);
     const mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, '0');
     const put = function(id, v, full){
