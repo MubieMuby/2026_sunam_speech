@@ -315,6 +315,7 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
     const set = (id, v) => { const e = doc.querySelector('#' + id); if (e) e.setAttribute('value', v); };
     set('f_cls', cls); set('f_no', no); set('f_name', name);
     doc.querySelectorAll('[data-nosave]').forEach(e => e.remove());   // 안내 띠·토스트는 파일에 남기지 않는다
+    doc.querySelectorAll('.mk.editing').forEach(e => e.classList.remove('editing'));   // 편집 중 표시는 파일에 남기지 않는다
     return '<!DOCTYPE html>' + NL + doc.outerHTML;
   }
   function buildBlob(cls, no, name){
@@ -495,7 +496,7 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
         }
         if (c && c.contains('mk')){
           const kind = c.contains('pv') ? 'pv' : 'nv';
-          out += '<span class="mk ' + kind + '" data-k="' + kind + '">' + esc(n.textContent) + '</span>';
+          out += '<span class="mk ' + kind + '" data-k="' + kind + '" contenteditable="false">' + esc(n.textContent) + '</span>';
           return;
         }
         if (tag === 'BR'){ out += '<br>'; return; }
