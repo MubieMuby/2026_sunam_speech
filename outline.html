@@ -447,11 +447,44 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
   }
 
   // ── 임시저장 (같은 기기·같은 브라우저에서만 복구됨) ─────────────────
+  // ── 칸의 자리 열쇠: 양식 판이 바뀌어 칸 수가 달라져도 같은 자리를 찾도록, 행 이름(td.lbl)+행 오프셋+행 안 순서로 만든다 ──
+  const normT = t => String(t || '').replace(/\s+/g, '').slice(0, 40);
+  function cellKeys(root){
+    const eds = Array.prototype.slice.call(root.querySelectorAll('[contenteditable="true"]'));
+    const seen = {};
+    return eds.map((el, idx) => {
+      let key;
+      const sec = el.getAttribute && el.getAttribute('data-sec');
+      if (sec) key = 'sec:' + sec;
+      else {
+        const tr = el.closest ? el.closest('tr') : null;
+        if (tr){
+          let t0 = tr, off = 0;
+          while (t0 && !t0.querySelector('td.lbl')){ t0 = t0.previousElementSibling; off++; }
+          const lbl = t0 ? normT(t0.querySelector('td.lbl').textContent) : '';
+          const cells = Array.prototype.slice.call(tr.querySelectorAll('[contenteditable="true"]'));
+          key = 'row:' + lbl + '+' + off + '#' + cells.indexOf(el);
+        } else key = 'idx:' + idx;
+      }
+      if (seen[key] != null){ seen[key]++; key += '~' + seen[key]; } else seen[key] = 0;
+      return key;
+    });
+  }
+  function cbKeys(root){
+    const seen = {};
+    return Array.prototype.map.call(root.querySelectorAll('.cb'), el => {
+      let key = 'cb:' + normT(el.textContent.replace(/[□■]/g, ''));
+      if (seen[key] != null){ seen[key]++; key += '~' + seen[key]; } else seen[key] = 0;
+      return key;
+    });
+  }
   function snapshot(){
     return {
       cls: idv('f_cls'), no: idv('f_no'), name: idv('f_name'),
       ed: Array.prototype.map.call(document.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
+      keys: cellKeys(document),
       cb: Array.prototype.map.call(document.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0),
+      cbk: cbKeys(document),
       t: Date.now()
     };
   }
@@ -495,7 +528,7 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
           return;
         }
         if (c && c.contains('mk')){
-          const kind = c.contains('pv') ? 'pv' : 'nv';
+          const kind = c.contains('pv') ? 'pv' : (c.contains('ag') ? 'ag' : 'nv');
           out += '<span class="mk ' + kind + '" data-k="' + kind + '" contenteditable="false">' + esc(n.textContent) + '</span>';
           return;
         }
@@ -563,56 +596,82 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
   });
   window.addEventListener('load', function(){ document.querySelectorAll('[contenteditable="true"]').forEach(scrub); });
 
+  const hasText = h => String(h || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim().length > 0;
   function applySnapshot(s){
     const setv = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
     setv('f_cls', s.cls); setv('f_no', s.no); setv('f_name', s.name);
     const eds = document.querySelectorAll('[contenteditable="true"]');
-    (s.ed || []).forEach((h, i) => { if (eds[i]) eds[i].innerHTML = cleanHtml(h); });
-    const cbs = document.querySelectorAll('.cb');
-    (s.cb || []).forEach((on, i) => {
-      if (!cbs[i]) return;
-      cbs[i].classList.toggle('on', !!on);
-      const b = cbs[i].querySelector('.bx'); if (b) b.textContent = on ? '■' : '□';
-    });
+    const src = s.ed || [];
+    let total = src.filter(hasText).length, hit = 0;
+    if (s.keys && s.keys.length === src.length){
+      const map = {}; s.keys.forEach((k, i) => { map[k] = src[i]; });
+      cellKeys(document).forEach((k, i) => {
+        if (k in map){ eds[i].innerHTML = cleanHtml(map[k]); if (hasText(map[k])) hit++; }
+      });
+    } else {
+      src.forEach((h, i) => { if (eds[i]){ eds[i].innerHTML = cleanHtml(h); if (hasText(h)) hit++; } });
+    }
+    const cbs = document.querySelectorAll('.cb'), cbsrc = s.cb || [];
+    const setCb = (el, on) => { el.classList.toggle('on', !!on); const b = el.querySelector('.bx'); if (b) b.textContent = on ? '■' : '□'; };
+    if (s.cbk && s.cbk.length === cbsrc.length){
+      const map = {}; s.cbk.forEach((k, i) => { map[k] = cbsrc[i]; });
+      cbKeys(document).forEach((k, i) => { if (k in map) setCb(cbs[i], map[k]); });
+    } else cbsrc.forEach((on, i) => { if (cbs[i]) setCb(cbs[i], on); });
     document.dispatchEvent(new Event('input'));
     document.dispatchEvent(new Event('keyup'));
+    return { hit: hit, total: total };
   }
   function snapshotFromDoc(doc){
     const gv = id => { const e = doc.getElementById(id); return e ? (e.getAttribute('value') || '').trim() : ''; };
     return {
       cls: gv('f_cls'), no: gv('f_no'), name: gv('f_name'),
       ed: Array.prototype.map.call(doc.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
-      cb: Array.prototype.map.call(doc.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0)
+      keys: cellKeys(doc),
+      cb: Array.prototype.map.call(doc.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0),
+      cbk: cbKeys(doc)
     };
   }
+  // 같은 종류의 양식인가: 제목에서 공백·괄호 주석을 뺀 앞부분으로 본다 (판이 달라도 같은 양식이면 통과)
+  const kindOf = t => String(t || '').replace(/\s+/g, '').replace(/\(.*?\)/g, '').replace(/[—\-–].*$/, '');
   function importFile(file){
     if (!file) return;
     const r = new FileReader();
+    r.onerror = function(){ alert('파일을 읽지 못했습니다. (' + file.name + ')' + NL + '파일을 이 기기로 먼저 내려받은 뒤 다시 골라 주세요.'); };
     r.onload = function(){
+      if (!/<html|<!doctype/i.test(String(r.result).slice(0, 2000))){
+        alert('이 파일은 저장한 양식 파일이 아닙니다. (' + file.name + ')' + NL + '「파일 저장」으로 만든 .html 파일을 골라 주세요.'); return;
+      }
       const doc = new DOMParser().parseFromString(r.result, 'text/html');
       const s = snapshotFromDoc(doc);
-      const nEd = document.querySelectorAll('[contenteditable="true"]').length;
-      if (s.ed.length !== nEd || (doc.title || '').replace(/\s+/g, '') !== DOC_KIND){
-        alert('이 양식으로 저장한 파일이 아닙니다.' + NL + '(' + file.name + ')'); return;
+      if (!s.ed.length || kindOf(doc.title) !== kindOf(document.title)){
+        alert('이 양식으로 저장한 파일이 아닙니다.' + NL + '(' + file.name + ')' + NL + '파일 제목: ' + (doc.title || '(없음)')); return;
       }
       const cur = snapshot();
       if (hasContent(cur) && !confirm('지금 화면의 내용을 지우고 「' + file.name + '」의 내용으로 바꿉니다. 계속할까요?')) return;
-      applySnapshot(s);
+      const res = applySnapshot(s);
       saveDraft();
-      toast('<b>불러왔습니다.</b> ' + file.name + '<br>이어서 쓴 뒤 다시 저장하세요.');
+      const nEd = document.querySelectorAll('[contenteditable="true"]').length;
+      let msg = '<b>불러왔습니다.</b> ' + file.name + '<br>내용이 있던 칸 ' + res.total + '개 중 ' + res.hit + '개를 제자리에 넣었습니다.';
+      if (res.hit < res.total) msg += '<br><b>이 파일은 이전 판 양식</b>이라 ' + (res.total - res.hit) + '개 칸은 자리를 못 찾았습니다. 아래 내용을 확인해 빠진 부분을 다시 적어 주세요.';
+      else if (s.ed.length !== nEd) msg += '<br>(이전 판 양식으로 저장한 파일이지만 모든 칸을 제자리에 넣었습니다)';
+      toast(msg + '<br>이어서 쓴 뒤 다시 저장하세요.', 14000);
     };
     r.readAsText(file, 'utf-8');
   }
-  function openFile(){
+  // 파일 선택 입력: 미리 만들어 두고 화면 밖에 둔다 (display:none 입력은 iOS 사파리에서 click()이 무시되는 경우가 있음).
+  // accept 는 두지 않는다 — iOS 파일 앱이 확장자·형식을 엄격히 걸러 학생 파일이 회색으로 비활성화되는 일을 막는다. 형식 검사는 읽은 뒤 내용으로 한다.
+  function fileInput(){
     let inp = document.getElementById('sv_open');
     if (!inp){
-      inp = document.createElement('input'); inp.type = 'file'; inp.id = 'sv_open'; inp.accept = '.html,.htm,text/html';
-      inp.hidden = true; inp.setAttribute('data-nosave', '1');
-      inp.addEventListener('change', function(){ importFile(this.files[0]); this.value = ''; });
+      inp = document.createElement('input'); inp.type = 'file'; inp.id = 'sv_open'; inp.setAttribute('data-nosave', '1');
+      inp.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;';
+      inp.setAttribute('aria-hidden', 'true'); inp.tabIndex = -1;
+      inp.addEventListener('change', function(){ if (this.files && this.files[0]) importFile(this.files[0]); this.value = ''; });
       document.body.appendChild(inp);
     }
-    inp.click();
+    return inp;
   }
+  function openFile(){ fileInput().click(); }
 
   // ── 화면 요소: 스타일 · 불러오기 단추 · 임시저장 복구 띠 · 앱 안 브라우저 경고 ──
   (function setup(){
@@ -641,6 +700,7 @@ td.ct { text-align:center; font-weight:bold; white-space:nowrap; }
       const b = document.createElement('button'); b.id = 'sv_openbtn'; b.type = 'button'; b.setAttribute('data-nosave', '1');
       b.textContent = '저장한 파일 불러오기'; b.title = '전에 저장한 파일을 열어 이어서 씁니다';
       b.addEventListener('click', openFile);
+      fileInput();
       saveBtn.parentNode.insertBefore(b, saveBtn);
       const ib = document.createElement('button'); ib.id = 'sv_infobtn'; ib.type = 'button'; ib.setAttribute('data-nosave', '1');
       ib.textContent = 'ⓘ'; ib.title = '이 기기에서 쓸 수 있는 저장 방식 보기';

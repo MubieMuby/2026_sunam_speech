@@ -29,7 +29,7 @@ u.key { text-decoration:underline; font-weight:bold; }
 .bar button { font-family:inherit; font-size:11px; padding:3px 8px; margin:2px 2px 0 0;
   border:1px solid #555; border-radius:6px; cursor:pointer; background:#fff; color:#000; }
 .bar button:hover { outline:2px solid #FFE95C; }
-.bar button.pv { background:#DCEBFF; } .bar button.nv { background:#FFE3CC; }
+.bar button.pv { background:#DCEBFF; } .bar button.nv { background:#FFE3CC; } .bar button.ag { background:#DDF3E3; }
 .bar #btog { float:right; background:#39434E; color:#fff; border-color:#5A646F; }
 .bar.min .row { display:none; }
 .bar.min { padding:5px 10px; }
@@ -97,6 +97,8 @@ span.mk.pv { color:#1F6FB2; background:#EAF3FC; }
 span.mk.nv { color:#C05A12; background:#FDF0E5; }
 span.mk.pv::before { content:'['; } span.mk.pv::after { content:']'; }
 span.mk.nv::before { content:'〈'; } span.mk.nv::after { content:'〉'; }
+span.mk.ag { color:#1D7A3F; background:#E4F5E8; }
+span.mk.ag::before { content:'▶ '; } span.mk.ag::after { content:''; }
 
 /* ── 카운트 패널 ── */
 .panel { position:fixed; bottom:0; left:0; right:0; z-index:60; background:#fff;
@@ -137,7 +139,7 @@ span.mk.editing { outline:2px solid #1F6FB2; }
 #pv .meta { font-size:10.5pt; text-align:right; color:#333; border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:8mm; }
 #pv h2 { font-size:12pt; margin:7mm 0 2mm; padding-bottom:1mm; border-bottom:1px solid #000; page-break-after:avoid; }
 #pv .p { orphans:3; widows:3; }
-#pv b.mk { font-weight:bold; } #pv b.mk.pv::before { content:'['; } #pv b.mk.pv::after { content:']'; } #pv b.mk.nv::before { content:'〈'; } #pv b.mk.nv::after { content:'〉'; }
+#pv b.mk { font-weight:bold; } #pv b.mk.pv::before { content:'['; } #pv b.mk.pv::after { content:']'; } #pv b.mk.nv::before { content:'〈'; } #pv b.mk.nv::after { content:'〉'; } #pv b.mk.ag::before { content:'▶ '; }
 body.preview { overflow:hidden; }
 body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .savebar, body.preview #sv_bar, body.preview #sv_toast { visibility:hidden; }
 @media print {
@@ -163,7 +165,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   .ed span.tag, .ed .tag { background:transparent !important; box-shadow:none !important; border:0 !important; padding:0 !important; color:inherit !important; }
   .ed .tl { display:none !important; }
   .ed span.mk, .ed .mk { font-weight:bold; background:transparent !important; }
-  .ed span.mk.pv, .ed .mk.pv { color:#000; } .ed span.mk.nv, .ed .mk.nv { color:#000; }
+  .ed span.mk.pv, .ed .mk.pv { color:#000; } .ed span.mk.nv, .ed .mk.nv { color:#000; } .ed span.mk.ag, .ed .mk.ag { color:#000; }
 }
 .pbtn { font-family:inherit; font-size:11px; padding:3px 9px; margin-left:8px; border:1.2px solid #000; border-radius:6px; background:#fff; cursor:pointer; vertical-align:middle; }
 @media (pointer: coarse) { .pbtn { font-size:14px; padding:8px 12px; } }
@@ -173,9 +175,10 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
  <button id="btog" type="button" onclick="toggleBar()" title="도구 막대 접기/펼치기">접기 ▲</button>
  <div class="row"><span class="cap">요소 표시</span><button onclick="addTag('1-1','1-1')">1-1 근거+출처</button><button onclick="addTag('1-3','1-3')">1-3 재반박</button><button onclick="addTag('2-1','2-1')">2-1 장면</button><button onclick="addTag('3-1','3-1')">3-1 직접 조사</button><button onclick="addTag('3-2','3-2')">3-2 자료의 한계</button><button onclick="addTag('4-2','4-2')">4-2 연결 표현</button><button onclick="addTag('5-1','5-1')">5-1 용어·비유·강조</button><button onclick="addTag('6-1','6-1')">6-1 맞춤 발언</button><button onclick="addTag('6-2','6-2')">6-2 질문</button><button onclick="addTag('6-4','6-4')">6-4 바라는 바</button></div>
  <div class="row"><span class="cap">4-1 필수 요소</span><button onclick="addTag('4-1①','① 관심 유발')">① 관심 유발</button><button onclick="addTag('4-1②','② 순서 예고')">② 순서 예고</button><button onclick="addTag('4-1③','③ 요약')">③ 요약</button><button onclick="addTag('4-1④','④ 전망·한계')">④ 전망·한계</button><button onclick="addTag('4-1⑤','⑤ 실천 독려')">⑤ 실천 독려</button></div>
- <div class="row"><span class="cap">준언어·비언어</span><button class="pv" onclick="addTok('pv')">[ 준언어 ] 넣기</button> <button class="nv" onclick="addTok('nv')">〈 비언어 〉 넣기</button>
+ <div class="row"><span class="cap">준언어·비언어</span><button class="pv" onclick="addTok('pv')">[ 준언어 ] 넣기</button> <button class="nv" onclick="addTok('nv')">〈 비언어 〉 넣기</button> <span class="cap" style="margin-left:10px">1-2 논증</span><button class="ag" onclick="addTok('ag')" title="논증(연역·귀납 등)이 시작되는 자리를 누른 뒤 누르세요. 시작 지점만 표시합니다">▶ 논증 구조 시작</button>
   <details class="howto"><summary>사용법</summary>
    <div>· <b>요소 표시</b>: 본문에서 표시할 부분을 <b>선택</b>하거나, 그 <b>문장 안을 한 번 누른</b> 뒤 단추를 누르세요 → 형광펜이 칠해집니다. 라벨을 누르면 해제됩니다.<br>
+   · <b>▶ 논증 구조</b>: 논증(연역·귀납 등)이 <b>시작되는 자리</b>를 누른 뒤 단추를 누르고 구조 이름을 적으세요. 시작 지점만 표시합니다.<br>
    · <b>준언어·비언어</b>: 넣을 자리를 누른 뒤 단추를 누르고, 괄호 안에 <b>구체적인 내용</b>을 적으세요. 넣은 괄호를 <b>누르면</b> 위에 편집 줄이 떠서 내용을 고치거나 지울 수 있습니다 — 예: [잠시 쉼] [여기부터 천천히] [크게 강조] 〈두 손을 펼침〉 〈칠판을 가리킴〉 〈웃는 표정〉</div>
   </details></div>
 </div>
@@ -263,6 +266,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
 <div class="cells">
  <span class="cell" style="color:#555">예상 시간은 띄어쓰기를 뺀 글자 수 ÷ 분당 280자 · 목표 3:30~4:00(초록) · 반드시 소리 내어 재 볼 것</span>
  <span class="cell">1-1 근거+출처 <span class="cnum" id="c_11">0</span>/2</span>
+ <span class="cell">1-2 논증 구조 ▶ <span class="cnum" id="c_12">0</span>/1</span>
  <span class="cell">1-3 재반박 <span class="cnum" id="c_13">0</span>/1</span>
  <span class="cell">2-1 장면 <span class="cnum" id="c_21">0</span>/1</span>
  <span class="cell">3-1 직접 조사 <span class="cnum" id="c_31">0</span>/1</span>
@@ -446,11 +450,44 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   }
 
   // ── 임시저장 (같은 기기·같은 브라우저에서만 복구됨) ─────────────────
+  // ── 칸의 자리 열쇠: 양식 판이 바뀌어 칸 수가 달라져도 같은 자리를 찾도록, 행 이름(td.lbl)+행 오프셋+행 안 순서로 만든다 ──
+  const normT = t => String(t || '').replace(/\s+/g, '').slice(0, 40);
+  function cellKeys(root){
+    const eds = Array.prototype.slice.call(root.querySelectorAll('[contenteditable="true"]'));
+    const seen = {};
+    return eds.map((el, idx) => {
+      let key;
+      const sec = el.getAttribute && el.getAttribute('data-sec');
+      if (sec) key = 'sec:' + sec;
+      else {
+        const tr = el.closest ? el.closest('tr') : null;
+        if (tr){
+          let t0 = tr, off = 0;
+          while (t0 && !t0.querySelector('td.lbl')){ t0 = t0.previousElementSibling; off++; }
+          const lbl = t0 ? normT(t0.querySelector('td.lbl').textContent) : '';
+          const cells = Array.prototype.slice.call(tr.querySelectorAll('[contenteditable="true"]'));
+          key = 'row:' + lbl + '+' + off + '#' + cells.indexOf(el);
+        } else key = 'idx:' + idx;
+      }
+      if (seen[key] != null){ seen[key]++; key += '~' + seen[key]; } else seen[key] = 0;
+      return key;
+    });
+  }
+  function cbKeys(root){
+    const seen = {};
+    return Array.prototype.map.call(root.querySelectorAll('.cb'), el => {
+      let key = 'cb:' + normT(el.textContent.replace(/[□■]/g, ''));
+      if (seen[key] != null){ seen[key]++; key += '~' + seen[key]; } else seen[key] = 0;
+      return key;
+    });
+  }
   function snapshot(){
     return {
       cls: idv('f_cls'), no: idv('f_no'), name: idv('f_name'),
       ed: Array.prototype.map.call(document.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
+      keys: cellKeys(document),
       cb: Array.prototype.map.call(document.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0),
+      cbk: cbKeys(document),
       t: Date.now()
     };
   }
@@ -494,7 +531,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
           return;
         }
         if (c && c.contains('mk')){
-          const kind = c.contains('pv') ? 'pv' : 'nv';
+          const kind = c.contains('pv') ? 'pv' : (c.contains('ag') ? 'ag' : 'nv');
           out += '<span class="mk ' + kind + '" data-k="' + kind + '" contenteditable="false">' + esc(n.textContent) + '</span>';
           return;
         }
@@ -562,56 +599,82 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   });
   window.addEventListener('load', function(){ document.querySelectorAll('[contenteditable="true"]').forEach(scrub); });
 
+  const hasText = h => String(h || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '').trim().length > 0;
   function applySnapshot(s){
     const setv = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
     setv('f_cls', s.cls); setv('f_no', s.no); setv('f_name', s.name);
     const eds = document.querySelectorAll('[contenteditable="true"]');
-    (s.ed || []).forEach((h, i) => { if (eds[i]) eds[i].innerHTML = cleanHtml(h); });
-    const cbs = document.querySelectorAll('.cb');
-    (s.cb || []).forEach((on, i) => {
-      if (!cbs[i]) return;
-      cbs[i].classList.toggle('on', !!on);
-      const b = cbs[i].querySelector('.bx'); if (b) b.textContent = on ? '■' : '□';
-    });
+    const src = s.ed || [];
+    let total = src.filter(hasText).length, hit = 0;
+    if (s.keys && s.keys.length === src.length){
+      const map = {}; s.keys.forEach((k, i) => { map[k] = src[i]; });
+      cellKeys(document).forEach((k, i) => {
+        if (k in map){ eds[i].innerHTML = cleanHtml(map[k]); if (hasText(map[k])) hit++; }
+      });
+    } else {
+      src.forEach((h, i) => { if (eds[i]){ eds[i].innerHTML = cleanHtml(h); if (hasText(h)) hit++; } });
+    }
+    const cbs = document.querySelectorAll('.cb'), cbsrc = s.cb || [];
+    const setCb = (el, on) => { el.classList.toggle('on', !!on); const b = el.querySelector('.bx'); if (b) b.textContent = on ? '■' : '□'; };
+    if (s.cbk && s.cbk.length === cbsrc.length){
+      const map = {}; s.cbk.forEach((k, i) => { map[k] = cbsrc[i]; });
+      cbKeys(document).forEach((k, i) => { if (k in map) setCb(cbs[i], map[k]); });
+    } else cbsrc.forEach((on, i) => { if (cbs[i]) setCb(cbs[i], on); });
     document.dispatchEvent(new Event('input'));
     document.dispatchEvent(new Event('keyup'));
+    return { hit: hit, total: total };
   }
   function snapshotFromDoc(doc){
     const gv = id => { const e = doc.getElementById(id); return e ? (e.getAttribute('value') || '').trim() : ''; };
     return {
       cls: gv('f_cls'), no: gv('f_no'), name: gv('f_name'),
       ed: Array.prototype.map.call(doc.querySelectorAll('[contenteditable="true"]'), e => e.innerHTML),
-      cb: Array.prototype.map.call(doc.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0)
+      keys: cellKeys(doc),
+      cb: Array.prototype.map.call(doc.querySelectorAll('.cb'), e => e.classList.contains('on') ? 1 : 0),
+      cbk: cbKeys(doc)
     };
   }
+  // 같은 종류의 양식인가: 제목에서 공백·괄호 주석을 뺀 앞부분으로 본다 (판이 달라도 같은 양식이면 통과)
+  const kindOf = t => String(t || '').replace(/\s+/g, '').replace(/\(.*?\)/g, '').replace(/[—\-–].*$/, '');
   function importFile(file){
     if (!file) return;
     const r = new FileReader();
+    r.onerror = function(){ alert('파일을 읽지 못했습니다. (' + file.name + ')' + NL + '파일을 이 기기로 먼저 내려받은 뒤 다시 골라 주세요.'); };
     r.onload = function(){
+      if (!/<html|<!doctype/i.test(String(r.result).slice(0, 2000))){
+        alert('이 파일은 저장한 양식 파일이 아닙니다. (' + file.name + ')' + NL + '「파일 저장」으로 만든 .html 파일을 골라 주세요.'); return;
+      }
       const doc = new DOMParser().parseFromString(r.result, 'text/html');
       const s = snapshotFromDoc(doc);
-      const nEd = document.querySelectorAll('[contenteditable="true"]').length;
-      if (s.ed.length !== nEd || (doc.title || '').replace(/\s+/g, '') !== DOC_KIND){
-        alert('이 양식으로 저장한 파일이 아닙니다.' + NL + '(' + file.name + ')'); return;
+      if (!s.ed.length || kindOf(doc.title) !== kindOf(document.title)){
+        alert('이 양식으로 저장한 파일이 아닙니다.' + NL + '(' + file.name + ')' + NL + '파일 제목: ' + (doc.title || '(없음)')); return;
       }
       const cur = snapshot();
       if (hasContent(cur) && !confirm('지금 화면의 내용을 지우고 「' + file.name + '」의 내용으로 바꿉니다. 계속할까요?')) return;
-      applySnapshot(s);
+      const res = applySnapshot(s);
       saveDraft();
-      toast('<b>불러왔습니다.</b> ' + file.name + '<br>이어서 쓴 뒤 다시 저장하세요.');
+      const nEd = document.querySelectorAll('[contenteditable="true"]').length;
+      let msg = '<b>불러왔습니다.</b> ' + file.name + '<br>내용이 있던 칸 ' + res.total + '개 중 ' + res.hit + '개를 제자리에 넣었습니다.';
+      if (res.hit < res.total) msg += '<br><b>이 파일은 이전 판 양식</b>이라 ' + (res.total - res.hit) + '개 칸은 자리를 못 찾았습니다. 아래 내용을 확인해 빠진 부분을 다시 적어 주세요.';
+      else if (s.ed.length !== nEd) msg += '<br>(이전 판 양식으로 저장한 파일이지만 모든 칸을 제자리에 넣었습니다)';
+      toast(msg + '<br>이어서 쓴 뒤 다시 저장하세요.', 14000);
     };
     r.readAsText(file, 'utf-8');
   }
-  function openFile(){
+  // 파일 선택 입력: 미리 만들어 두고 화면 밖에 둔다 (display:none 입력은 iOS 사파리에서 click()이 무시되는 경우가 있음).
+  // accept 는 두지 않는다 — iOS 파일 앱이 확장자·형식을 엄격히 걸러 학생 파일이 회색으로 비활성화되는 일을 막는다. 형식 검사는 읽은 뒤 내용으로 한다.
+  function fileInput(){
     let inp = document.getElementById('sv_open');
     if (!inp){
-      inp = document.createElement('input'); inp.type = 'file'; inp.id = 'sv_open'; inp.accept = '.html,.htm,text/html';
-      inp.hidden = true; inp.setAttribute('data-nosave', '1');
-      inp.addEventListener('change', function(){ importFile(this.files[0]); this.value = ''; });
+      inp = document.createElement('input'); inp.type = 'file'; inp.id = 'sv_open'; inp.setAttribute('data-nosave', '1');
+      inp.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;';
+      inp.setAttribute('aria-hidden', 'true'); inp.tabIndex = -1;
+      inp.addEventListener('change', function(){ if (this.files && this.files[0]) importFile(this.files[0]); this.value = ''; });
       document.body.appendChild(inp);
     }
-    inp.click();
+    return inp;
   }
+  function openFile(){ fileInput().click(); }
 
   // ── 화면 요소: 스타일 · 불러오기 단추 · 임시저장 복구 띠 · 앱 안 브라우저 경고 ──
   (function setup(){
@@ -640,6 +703,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
       const b = document.createElement('button'); b.id = 'sv_openbtn'; b.type = 'button'; b.setAttribute('data-nosave', '1');
       b.textContent = '저장한 파일 불러오기'; b.title = '전에 저장한 파일을 열어 이어서 씁니다';
       b.addEventListener('click', openFile);
+      fileInput();
       saveBtn.parentNode.insertBefore(b, saveBtn);
       const ib = document.createElement('button'); ib.id = 'sv_infobtn'; ib.type = 'button'; ib.setAttribute('data-nosave', '1');
       ib.textContent = 'ⓘ'; ib.title = '이 기기에서 쓸 수 있는 저장 방식 보기';
@@ -789,7 +853,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
     tok.className = 'mk ' + kind;
     tok.setAttribute('data-k', kind);
     tok.setAttribute('contenteditable', 'false');          // 커서가 칩 안으로 못 들어간다 (갇힘·한글 조합 끊김 방지)
-    tok.textContent = kind === 'pv' ? '잠시 쉼' : '두 손을 펼침';
+    tok.textContent = kind === 'pv' ? '잠시 쉼' : (kind === 'ag' ? '연역' : '두 손을 펼침');
     r.insertNode(tok);
     openChipEditor(tok);
     countAll2();
@@ -842,7 +906,8 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
   function openChipEditor(mk){
     CHIP = mk;
     const ed = chipEditor();
-    ed.querySelector('#chipLbl').textContent = mk.classList.contains('pv') ? '[ 준언어 ] 안에 넣을 내용' : '〈 비언어 〉 안에 넣을 내용';
+    ed.querySelector('#chipLbl').textContent = mk.classList.contains('pv') ? '[ 준언어 ] 안에 넣을 내용'
+      : (mk.classList.contains('ag') ? '▶ 논증 구조 — 여기서 시작하는 구조 (연역 · 귀납 등)' : '〈 비언어 〉 안에 넣을 내용');
     const inp = ed.querySelector('#chipIn'); inp.value = mk.textContent;
     ed.classList.add('show');
     mk.classList.add('editing');
@@ -913,6 +978,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
     te.textContent = mm + ':' + ss;
     te.className = 'cnum' + (secs >= 210 && secs <= 240 ? ' cok' : (chars === 0 ? ' czero' : ''));
     const cnt = function(selector){ return document.querySelectorAll(selector).length; };
+    put('c_12', cnt('span.mk.ag'), 1);
     put('c_para', cnt('span.mk.pv'), 3);
     put('c_nv', cnt('span.mk.nv'), 2);
     const tags = function(code){ return cnt('span.tag[data-c="' + code + '"]'); };
@@ -934,7 +1000,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
         if (n.nodeType !== 1) return;
         const c = n.classList, tag = n.tagName;
         if (c && c.contains('tl')) return;                                   // 형광펜 라벨은 뺀다
-        if (c && c.contains('mk')){ const k = c.contains('pv') ? 'pv' : 'nv'; out += '<b class="mk ' + k + '">' + esc(n.textContent) + '</b>'; return; }
+        if (c && c.contains('mk')){ const k = c.contains('pv') ? 'pv' : (c.contains('ag') ? 'ag' : 'nv'); out += '<b class="mk ' + k + '">' + esc(n.textContent) + '</b>'; return; }
         if (tag === 'BR'){ out += '<br>'; return; }
         if (tag === 'DIV' || tag === 'P'){ out += (out ? '<br>' : '') + walk(n); return; }
         out += walk(n);
@@ -965,7 +1031,7 @@ body.preview .sheet, body.preview .bar, body.preview .panel, body.preview .saveb
       + '.meta{font-size:10.5pt;text-align:right;color:#333;border-bottom:1px solid #000;padding-bottom:4px;margin-bottom:8mm}'
       + 'h2{font-size:12pt;margin:7mm 0 2mm;padding-bottom:1mm;border-bottom:1px solid #000;page-break-after:avoid}'
       + '.p{orphans:3;widows:3;white-space:normal}'
-      + 'b.mk{font-weight:bold} b.mk.pv::before{content:"["} b.mk.pv::after{content:"]"} b.mk.nv::before{content:"〈"} b.mk.nv::after{content:"〉"}'
+      + 'b.mk{font-weight:bold} b.mk.pv::before{content:"["} b.mk.pv::after{content:"]"} b.mk.nv::before{content:"〈"} b.mk.nv::after{content:"〉"} b.mk.ag::before{content:"▶ "}'
       + '@media print{.tools{display:none} .wrap{max-width:none;padding:0}}'
       + '</style></head><body>'
       + '<div class="tools"><button onclick="window.print()">🖨 인쇄</button>'
